@@ -1,0 +1,3612 @@
+<!doctype html>
+<html lang="id" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panduan Bootcamp Laravel | Sistem Manajemen Event Kampus</title>
+    <!-- Preconnect untuk kecepatan unduh font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Anti-FOUC (Flash of Unstyled Content) Script -->
+    <script>
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!localStorage.getItem("theme") &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    </script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                200: "#c7d2fe",
+                500: "#6366f1",
+                600: "#4f46e5",
+                700: "#4338ca",
+                800: "#3730a3",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <!-- Font Inter, JetBrains Mono & FontAwesome Icons -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      /* Kode Inline */
+      .prose code:not(pre code) {
+        font-family: "JetBrains Mono", monospace;
+        background-color: #f1f5f9;
+        color: #4f46e5;
+        padding: 0.2rem 0.45rem;
+        border-radius: 0.375rem;
+        font-size: 0.85em;
+        border: 1px solid #e2e8f0;
+      }
+      .dark .prose code:not(pre code) {
+        color: #818cf8;
+        background-color: #1e293b;
+        border-color: #334155;
+      }
+
+      /* Container Editor Kode (Sesuai Desain Mac/Terminal Modern) */
+      .code-snippet-box {
+        background-color: #070d19;
+        border: 1px solid #1e293b;
+        border-radius: 0.875rem;
+        overflow: hidden;
+        margin: 1.25rem 0;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+      }
+
+      .code-snippet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.65rem 1rem;
+        background-color: #0b1325;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      }
+
+      .mac-dots {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+      }
+      .mac-dot {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: 9999px;
+        display: inline-block;
+      }
+      .mac-dot.red {
+        background-color: #ef4444;
+      }
+      .mac-dot.yellow {
+        background-color: #eab308;
+      }
+      .mac-dot.green {
+        background-color: #22c55e;
+      }
+
+      .code-snippet-body {
+        padding: 1.2rem 1.25rem;
+        margin: 0;
+        overflow-x: auto;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: #f1f5f9;
+      }
+      .code-snippet-body code {
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        color: inherit !important;
+        font-family: inherit;
+      }
+
+      /* Shimmer Animation untuk Skeleton */
+      @keyframes shimmerPulse {
+        0% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.5;
+        }
+      }
+      .skeleton-shimmer {
+        animation: shimmerPulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200"
+  >
+    <!-- TOP NAVBAR -->
+    <header
+      class="sticky top-0 z-40 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700 shadow-sm"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between"
+      >
+        <div
+          class="flex items-center space-x-3 cursor-pointer"
+          onclick="handleLogoClick()"
+        >
+          <div
+            class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md flex items-center justify-center"
+          >
+            <i class="fa-solid fa-graduation-cap text-lg"></i>
+          </div>
+          <div>
+            <span
+              class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-brand-600 to-indigo-500 bg-clip-text text-transparent"
+              >Bootcamp Laravel</span
+            >
+            <span
+              class="text-xs block text-slate-500 dark:text-slate-400 font-medium"
+              >Interactive Learning Platform</span
+            >
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <!-- Status Sinkronisasi Background (Non-blocking) -->
+          <div
+            id="sync-status"
+            class="hidden items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-slate-100 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400"
+          >
+            <span
+              class="w-2 h-2 rounded-full bg-emerald-500"
+              id="sync-dot"
+            ></span>
+            <span id="sync-text">Tersinkron</span>
+          </div>
+
+          <!-- Theme Toggle Button -->
+          <button
+            onclick="toggleTheme()"
+            class="p-2.5 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+            title="Ganti Tema"
+          >
+            <i id="theme-icon" class="fa-solid fa-moon"></i>
+          </button>
+
+          <!-- User Session Profile / Auth Button Container -->
+          <div id="auth-nav-container" class="flex items-center space-x-2">
+            <!-- Dinamis via JS -->
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 w-full mx-auto">
+      <!-- Toast Notification Box -->
+      <div
+        id="toast"
+        class="fixed top-20 right-4 z-50 transform translate-x-full transition-transform duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-sm font-medium border border-slate-700 dark:border-slate-200"
+      >
+        <i
+          id="toast-icon"
+          class="fa-solid fa-circle-check text-emerald-400"
+        ></i>
+        <span id="toast-msg">Pemberitahuan sistem</span>
+      </div>
+
+      <!-- ==================== VIEW 1: PUBLIC LANDING PAGE ==================== -->
+      <section id="view-landing" class="block">
+        <!-- Hero Section -->
+        <div
+          class="relative overflow-hidden bg-gradient-to-b from-brand-50/50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 py-16 sm:py-24 border-b border-slate-200/80 dark:border-slate-800"
+        >
+          <div
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6"
+          >
+            <div
+              class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-brand-100/70 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-semibold shadow-sm"
+            >
+              <i class="fa-solid fa-bolt text-amber-500"></i>
+              <span>Panduan Lengkap Peserta Bootcamp Laravel Dasar</span>
+            </div>
+            <h1
+              class="text-4xl sm:text-6xl font-black text-slate-900 dark:text-white tracking-tight max-w-4xl mx-auto leading-tight sm:leading-none"
+            >
+              Membangun
+              <span
+                class="bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent"
+                >CRUD Event Kampus</span
+              >
+              dari Nol
+            </h1>
+            <p
+              class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed"
+            >
+              Kuasai Laravel 10, integrasi template SB Admin 2, MySQL Migration
+              & Seeder, Upload Gambar, Pagination, dan konfirmasi interaktif
+              SweetAlert2.
+            </p>
+            <div
+              class="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3"
+            >
+              <button
+                onclick="switchView('login')"
+                class="w-full sm:w-auto px-8 py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/25 transition flex items-center justify-center space-x-2 text-sm"
+              >
+                <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                <span>Masuk / Mulai Belajar</span>
+              </button>
+              <a
+                href="#preview-kurikulum"
+                class="w-full sm:w-auto px-6 py-3.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold rounded-2xl transition flex items-center justify-center space-x-2 text-sm"
+              >
+                <i class="fa-solid fa-list-ul text-slate-400"></i>
+                <span>Lihat Silabus Materi</span>
+              </a>
+            </div>
+
+            <!-- Highlight Badges -->
+            <div
+              class="pt-10 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto"
+            >
+              <div
+                class="p-4 rounded-2xl bg-white/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 shadow-sm text-center"
+              >
+                <div
+                  class="text-2xl font-black text-brand-600 dark:text-brand-400"
+                >
+                  100%
+                </div>
+                <div
+                  class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium"
+                >
+                  Praktik Berbasis Kasus
+                </div>
+              </div>
+              <div
+                class="p-4 rounded-2xl bg-white/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 shadow-sm text-center"
+              >
+                <div
+                  class="text-2xl font-black text-emerald-600 dark:text-emerald-400"
+                >
+                  Terminal
+                </div>
+                <div
+                  class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium"
+                >
+                  Perintah CLI Sekali Salin
+                </div>
+              </div>
+              <div
+                class="p-4 rounded-2xl bg-white/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 shadow-sm text-center"
+              >
+                <div class="text-2xl font-black text-amber-500">Video</div>
+                <div
+                  class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium"
+                >
+                  Embed YouTube Interaktif
+                </div>
+              </div>
+              <div
+                class="p-4 rounded-2xl bg-white/70 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 shadow-sm text-center"
+              >
+                <div
+                  class="text-2xl font-black text-purple-600 dark:text-purple-400"
+                >
+                  GAS DB
+                </div>
+                <div
+                  class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium"
+                >
+                  Tersinkron Google Sheets
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview Silabus Kurikulum (Public Preview dengan Status Terkunci) -->
+        <div
+          id="preview-kurikulum"
+          class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-8"
+        >
+          <div class="text-center space-y-2">
+            <span
+              class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400"
+              >Silabus Lengkap</span
+            >
+            <h2
+              class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white"
+            >
+              Daftar Modul & Materi Bootcamp
+            </h2>
+            <p
+              class="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto"
+            >
+              Silakan login ke akun Anda untuk membuka isi materi, video
+              pembelajaran, dan instruksi terminal lengkap.
+            </p>
+          </div>
+
+          <div id="landing-syllabus-container" class="space-y-4">
+            <!-- Diisi dinamis oleh renderLandingSyllabus() -->
+          </div>
+
+          <!-- Banner CTA Bawah -->
+          <div
+            class="mt-12 bg-gradient-to-r from-brand-600 to-indigo-700 rounded-3xl p-8 sm:p-10 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6"
+          >
+            <div class="space-y-2 text-center md:text-left">
+              <h3 class="text-2xl font-extrabold">
+                Siap Memulai Petualangan Belajar?
+              </h3>
+              <p class="text-brand-100 text-sm max-w-lg">
+                Masuk sekarang secara gratis untuk mengakses dokumen materi,
+                panduan praktis, dan melacak persentase kelulusan Anda.
+              </p>
+            </div>
+            <button
+              onclick="switchView('login')"
+              class="shrink-0 px-8 py-3.5 bg-white text-brand-700 hover:bg-brand-50 font-bold rounded-2xl shadow-md transition flex items-center space-x-2 text-sm"
+            >
+              <span>Masuk ke Kelas</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 2: LOGIN FORM ==================== -->
+      <section
+        id="view-login"
+        class="hidden flex items-center justify-center min-h-[75vh] px-4 py-8"
+      >
+        <div
+          class="bg-white dark:bg-slate-800 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 w-full max-w-md"
+        >
+          <div class="text-center mb-6">
+            <div
+              class="w-14 h-14 mx-auto bg-brand-50 dark:bg-brand-900/40 text-brand-600 rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-inner"
+            >
+              <i class="fa-solid fa-user-lock"></i>
+            </div>
+            <h2 class="text-2xl font-bold">Masuk ke Bootcamp</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Masuk dengan akun Anda untuk membuka seluruh materi kurikulum
+            </p>
+          </div>
+          <form
+            id="form-login"
+            onsubmit="handleLoginSubmit(event)"
+            class="space-y-4"
+          >
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1"
+                >Username</label
+              >
+              <input
+                type="text"
+                id="login-username"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="admin atau peserta"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1"
+                >Password</label
+              >
+              <input
+                type="password"
+                id="login-password"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                placeholder="••••••••"
+              />
+            </div>
+            <button
+              type="submit"
+              id="btn-login-submit"
+              class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2"
+            >
+              <span>Masuk Sekarang</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+            <button
+              type="button"
+              onclick="switchView('landing')"
+              class="w-full py-2 text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition"
+            >
+              &larr; Kembali ke Beranda
+            </button>
+          </form>
+          <div
+            class="mt-6 p-4 rounded-2xl bg-slate-50 dark:bg-slate-700/50 text-xs text-slate-500 dark:text-slate-400 space-y-2 border border-slate-100 dark:border-slate-700"
+          >
+            <p
+              class="font-semibold text-slate-700 dark:text-slate-300 flex items-center"
+            >
+              <i class="fa-solid fa-key text-amber-500 mr-1.5"></i>
+              <span>Akun Demo Cepat (Klik untuk Mengisi):</span>
+            </p>
+            <div
+              class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600"
+            >
+              <span
+                >Peserta:
+                <code class="text-brand-600 dark:text-brand-400 font-semibold"
+                  >peserta</code
+                >
+                / <code class="text-slate-400">user123</code></span
+              >
+              <button
+                type="button"
+                onclick="quickFillLogin('peserta', 'user123')"
+                class="px-2.5 py-1 text-[11px] bg-brand-50 dark:bg-brand-950/40 text-brand-600 dark:text-brand-300 rounded-lg font-bold hover:bg-brand-100 transition"
+              >
+                Gunakan
+              </button>
+            </div>
+            <!-- <div
+              class="flex items-center justify-between p-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600"
+            >
+              <span
+                >Admin:
+                <code class="text-amber-600 dark:text-amber-400 font-semibold"
+                  >admin</code
+                >
+                / <code class="text-slate-400">adminpassword</code></span
+              >
+              <button
+                type="button"
+                onclick="quickFillLogin('admin', 'adminpassword')"
+                class="px-2.5 py-1 text-[11px] bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-300 rounded-lg font-bold hover:bg-amber-100 transition"
+              >
+                Gunakan
+              </button>
+            </div> -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 3: PRIVATE DASHBOARD (BELAJAR) ==================== -->
+      <section
+        id="view-dashboard"
+        class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-8"
+      >
+        <!-- Progress Banner -->
+        <div
+          class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div class="flex items-center space-x-4 w-full sm:w-auto">
+            <div
+              class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl shrink-0"
+            >
+              <i class="fa-solid fa-chart-pie"></i>
+            </div>
+            <div>
+              <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                Kemajuan Belajar Anda
+              </h4>
+              <p
+                id="progress-summary-text"
+                class="text-xs text-slate-500 dark:text-slate-400"
+              >
+                0 dari 0 materi terselesaikan (0%)
+              </p>
+            </div>
+          </div>
+          <div
+            class="w-full sm:w-64 bg-slate-100 dark:bg-slate-700 rounded-full h-3 overflow-hidden"
+          >
+            <div
+              id="progress-bar-fill"
+              class="bg-emerald-500 h-full w-0 transition-all duration-500 rounded-full"
+            ></div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Sidebar Daftar Isi / Accordion -->
+          <aside
+            class="lg:col-span-4 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden sticky top-20"
+          >
+            <div
+              class="p-4 border-b border-slate-200 dark:border-slate-700 space-y-3"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-bold text-base">Daftar Isi Kurikulum</h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">
+                    Klik bab untuk membaca materi
+                  </p>
+                </div>
+                <div id="admin-action-btn-container"></div>
+              </div>
+              <div class="relative">
+                <i
+                  class="fa-solid fa-search absolute left-3 top-2.5 text-xs text-slate-400"
+                ></i>
+                <input
+                  type="text"
+                  id="search-syllabus"
+                  oninput="handleSearchSyllabus(event)"
+                  placeholder="Cari modul atau sub-materi..."
+                  class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+              </div>
+            </div>
+            <div
+              id="sidebar-syllabus"
+              class="divide-y divide-slate-100 dark:divide-slate-700/50 max-h-[calc(100vh-19rem)] overflow-y-auto"
+            >
+              <!-- Diisi dinamis oleh renderSyllabus() -->
+            </div>
+          </aside>
+
+          <!-- Content Viewer Utama -->
+          <article
+            class="lg:col-span-8 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 sm:p-8 min-h-[550px]"
+          >
+            <div id="lesson-content-view">
+              <!-- Default State sebelum memilih materi -->
+              <div class="text-center py-20 space-y-4">
+                <div
+                  class="w-20 h-20 bg-brand-50 dark:bg-brand-900/30 text-brand-600 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-inner"
+                >
+                  <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <h3 class="text-xl font-bold">Mulai Belajar Sekarang</h3>
+                <p
+                  class="text-slate-500 dark:text-slate-400 max-w-md mx-auto text-sm leading-relaxed"
+                >
+                  Pilih salah satu bab sub-materi dari daftar isi di sebelah
+                  kiri untuk membuka dokumen materi, panduan praktis, dan video
+                  tutorial interaktif.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ==================== VIEW 4: ADMIN PANEL ==================== -->
+      <section
+        id="view-admin"
+        class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 pb-24 md:pb-8"
+      >
+        <div
+          class="flex items-center justify-between bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+        >
+          <div>
+            <h2 class="text-xl font-bold">Panel Administrasi Kurikulum</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              Kelola modul pembelajaran, materi kurikulum, dan sinkronisasi
+              database.
+            </p>
+          </div>
+          <button
+            onclick="switchView('dashboard')"
+            class="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition flex items-center space-x-2"
+          >
+            <i class="fa-solid fa-arrow-left text-xs"></i>
+            <span>Kembali ke Belajar</span>
+          </button>
+        </div>
+
+        <!-- Daftar Kelola Modul & Materi (Edit & Hapus) -->
+        <div
+          class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4"
+        >
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-700/60 pb-3"
+          >
+            <div class="flex items-center space-x-2">
+              <div
+                class="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-brand-600 flex items-center justify-center text-sm"
+              >
+                <i class="fa-solid fa-list-check"></i>
+              </div>
+              <h3
+                class="font-bold text-base text-slate-800 dark:text-slate-100"
+              >
+                Daftar Modul & Materi Kurikulum
+              </h3>
+            </div>
+            <span class="text-xs text-slate-400"
+              >Pilih tombol Edit atau Hapus untuk memodifikasi isi</span
+            >
+          </div>
+          <div
+            id="admin-management-list"
+            class="space-y-4 max-h-[450px] overflow-y-auto pr-1"
+          >
+            <!-- Diisi dinamis oleh renderAdminManagementList() -->
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Form Tambah Modul -->
+          <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+          >
+            <h3
+              class="font-bold text-base mb-4 flex items-center space-x-2 text-brand-600 dark:text-brand-400"
+            >
+              <i class="fa-solid fa-folder-plus"></i>
+              <span class="text-slate-800 dark:text-slate-100"
+                >Tambah Modul Baru</span
+              >
+            </h3>
+            <form onsubmit="handleAddModule(event)" class="space-y-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Nama Kategori / Modul</label
+                >
+                <input
+                  type="text"
+                  id="admin-mod-kategori"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="Contoh: Modul 4: Backend & Database"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Judul Modul</label
+                >
+                <input
+                  type="text"
+                  id="admin-mod-judul"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="Contoh: Integrasi Google Apps Script"
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Deskripsi Singkat</label
+                >
+                <textarea
+                  id="admin-mod-desc"
+                  rows="2"
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="Deskripsi ringkas materi dalam modul ini..."
+                ></textarea>
+              </div>
+              <button
+                type="submit"
+                id="btn-save-mod"
+                class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm transition shadow-md shadow-brand-500/20"
+              >
+                Simpan Modul
+              </button>
+            </form>
+          </div>
+
+          <!-- Form Tambah Sub-Materi / Lesson -->
+          <div
+            class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm"
+          >
+            <h3
+              class="font-bold text-base mb-4 flex items-center space-x-2 text-brand-600 dark:text-brand-400"
+            >
+              <i class="fa-solid fa-file-circle-plus"></i>
+              <span class="text-slate-800 dark:text-slate-100"
+                >Tambah Sub-Materi / Bab</span
+              >
+            </h3>
+            <form onsubmit="handleAddLesson(event)" class="space-y-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Pilih Induk Modul</label
+                >
+                <select
+                  id="admin-les-modid"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                >
+                  <!-- Diisi dinamis -->
+                </select>
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Judul Sub-Materi</label
+                >
+                <input
+                  type="text"
+                  id="admin-les-judul"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="Contoh: 4.1 Setup Database Sheets"
+                />
+              </div>
+              <div>
+                <div class="flex items-center justify-between mb-1">
+                  <label
+                    class="block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                    >Video YouTube (Opsional)</label
+                  >
+                  <span
+                    class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium"
+                    >Bisa tempel link biasa, youtu.be, shorts, atau iframe</span
+                  >
+                </div>
+                <input
+                  type="text"
+                  id="admin-les-video"
+                  oninput="handleVideoUrlInput(this)"
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="Tempel URL YouTube (https://youtu.be/... atau watch?v=...)"
+                />
+                <p
+                  id="admin-video-hint"
+                  class="text-[11px] text-slate-400 mt-1 hidden"
+                ></p>
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Konten HTML / Dokumen</label
+                >
+                <textarea
+                  id="admin-les-konten"
+                  rows="4"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none"
+                  placeholder="<h2>Judul</h2><p>Teks materi pembelajaran...</p>"
+                ></textarea>
+                <div
+                  class="mt-2 flex flex-wrap items-center justify-between gap-2"
+                >
+                  <span class="text-[11px] text-slate-400"
+                    >Sisipkan cepat ke dokumen:</span
+                  >
+                  <div class="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onclick="openSnippetModal('terminal')"
+                      class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 transition flex items-center space-x-1.5"
+                    >
+                      <i
+                        class="fa-solid fa-terminal text-[10px] text-emerald-500"
+                      ></i>
+                      <span>+ Terminal / CLI</span>
+                    </button>
+                    <button
+                      type="button"
+                      onclick="openSnippetModal('code')"
+                      class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/40 dark:hover:bg-brand-900/60 text-brand-600 dark:text-brand-300 transition flex items-center space-x-1.5"
+                    >
+                      <i class="fa-solid fa-code text-[10px]"></i>
+                      <span>+ File Kode</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="submit"
+                id="btn-save-les"
+                class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-sm transition shadow-md shadow-brand-500/20"
+              >
+                Simpan Sub-Materi
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODAL EDIT MODUL -->
+      <div
+        id="modal-edit-module"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+        >
+          <div
+            class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between"
+          >
+            <div class="flex items-center space-x-2.5">
+              <div
+                class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center text-sm"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </div>
+              <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                Edit Data Modul
+              </h3>
+            </div>
+            <button
+              type="button"
+              onclick="closeEditModuleModal()"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+            >
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+          <form
+            onsubmit="handleUpdateModuleSubmit(event)"
+            class="p-6 space-y-4"
+          >
+            <input type="hidden" id="edit-mod-id" />
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >Nama Kategori / Modul</label
+              >
+              <input
+                type="text"
+                id="edit-mod-kategori"
+                required
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >Judul Modul</label
+              >
+              <input
+                type="text"
+                id="edit-mod-judul"
+                required
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+              />
+            </div>
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >Deskripsi Singkat</label
+              >
+              <textarea
+                id="edit-mod-desc"
+                rows="3"
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+              ></textarea>
+            </div>
+            <div class="flex items-center justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                onclick="closeEditModuleModal()"
+                class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                id="btn-update-mod"
+                class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition shadow-sm"
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL EDIT SUB-MATERI -->
+      <div
+        id="modal-edit-lesson"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-white dark:bg-slate-800 w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+        >
+          <div
+            class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between"
+          >
+            <div class="flex items-center space-x-2.5">
+              <div
+                class="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 flex items-center justify-center text-sm"
+              >
+                <i class="fa-solid fa-file-pen"></i>
+              </div>
+              <h3 class="font-bold text-sm text-slate-800 dark:text-slate-100">
+                Edit Sub-Materi & Dokumen
+              </h3>
+            </div>
+            <button
+              type="button"
+              onclick="closeEditLessonModal()"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+            >
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+          <form
+            onsubmit="handleUpdateLessonSubmit(event)"
+            class="p-6 space-y-4"
+          >
+            <input type="hidden" id="edit-les-id" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Induk Modul</label
+                >
+                <select
+                  id="edit-les-modid"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                ></select>
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Judul Sub-Materi</label
+                >
+                <input
+                  type="text"
+                  id="edit-les-judul"
+                  required
+                  class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                />
+              </div>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                  >Video YouTube (Opsional)</label
+                >
+                <span
+                  class="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium"
+                  >Auto-convert ke embed</span
+                >
+              </div>
+              <input
+                type="text"
+                id="edit-les-video"
+                oninput="handleVideoUrlInput(this)"
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none"
+                placeholder="Tempel URL YouTube (https://youtu.be/... atau watch?v=...)"
+              />
+              <p
+                id="edit-video-hint"
+                class="text-[11px] text-slate-400 mt-1 hidden"
+              ></p>
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500"
+                  >Konten HTML / Dokumen</label
+                >
+                <div class="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onclick="openSnippetModal('terminal', 'edit-les-konten')"
+                    class="px-2 py-0.5 text-[11px] font-semibold rounded bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200"
+                  >
+                    + Terminal
+                  </button>
+                  <button
+                    type="button"
+                    onclick="openSnippetModal('code', 'edit-les-konten')"
+                    class="px-2 py-0.5 text-[11px] font-semibold rounded bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300"
+                  >
+                    + File Kode
+                  </button>
+                </div>
+              </div>
+              <textarea
+                id="edit-les-konten"
+                rows="6"
+                required
+                class="w-full px-4 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm font-mono focus:ring-2 focus:ring-brand-500 outline-none"
+              ></textarea>
+            </div>
+            <div class="flex items-center justify-end space-x-2 pt-2">
+              <button
+                type="button"
+                onclick="closeEditLessonModal()"
+                class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition"
+              >
+                Batal
+              </button>
+              <button
+                type="submit"
+                id="btn-update-les"
+                class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition shadow-sm"
+              >
+                Simpan Perubahan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- MODAL KONFIRMASI HAPUS (NO ALERT / NO CONFIRM) -->
+      <div
+        id="modal-confirm-delete"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-white dark:bg-slate-800 w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 text-center space-y-4"
+        >
+          <div
+            class="w-14 h-14 mx-auto rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-500 flex items-center justify-center text-2xl"
+          >
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">
+              Konfirmasi Hapus
+            </h3>
+            <p
+              id="delete-confirm-text"
+              class="text-xs text-slate-500 dark:text-slate-400 mt-2 leading-relaxed"
+            >
+              Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak
+              dapat dibatalkan.
+            </p>
+          </div>
+          <div class="flex items-center justify-center space-x-3 pt-2">
+            <button
+              type="button"
+              onclick="closeDeleteConfirmModal()"
+              class="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 text-slate-700 dark:text-slate-200 transition"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              id="btn-confirm-delete-action"
+              onclick="executePendingDelete()"
+              class="px-4 py-2 text-xs font-semibold rounded-xl bg-rose-600 hover:bg-rose-700 text-white transition shadow-sm flex items-center space-x-1.5"
+            >
+              <i class="fa-solid fa-trash-can text-xs"></i>
+              <span>Ya, Hapus Sekarang</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL GENERATOR BLOK TERMINAL / KODE -->
+      <div
+        id="modal-snippet"
+        class="hidden fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4"
+      >
+        <div
+          class="bg-white dark:bg-slate-800 w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+        >
+          <div
+            class="px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between"
+          >
+            <div class="flex items-center space-x-2.5">
+              <div
+                class="w-8 h-8 rounded-lg bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-400 flex items-center justify-center text-sm"
+              >
+                <i class="fa-solid fa-terminal"></i>
+              </div>
+              <div>
+                <h3
+                  class="font-bold text-sm text-slate-800 dark:text-slate-100"
+                >
+                  Generator Blok Terminal & Kode
+                </h3>
+                <p class="text-[11px] text-slate-400">
+                  Buat box perintah CLI atau file source code tanpa menulis tag
+                  HTML manual
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onclick="closeSnippetModal()"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+            >
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+          </div>
+
+          <div class="p-6 space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Preset Tipe</label
+                >
+                <div class="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    id="preset-btn-terminal"
+                    onclick="applySnippetPreset('terminal')"
+                    class="px-3 py-2 rounded-xl text-xs font-semibold border border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 flex items-center justify-center space-x-2"
+                  >
+                    <i class="fa-solid fa-terminal"></i>
+                    <span>Perintah Terminal</span>
+                  </button>
+                  <button
+                    type="button"
+                    id="preset-btn-code"
+                    onclick="applySnippetPreset('code')"
+                    class="px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center space-x-2"
+                  >
+                    <i class="fa-solid fa-file-code"></i>
+                    <span>File Program</span>
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label
+                  class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                  >Label Header (Nama File / Shell)</label
+                >
+                <input
+                  type="text"
+                  id="snippet-label"
+                  oninput="updateSnippetModalPreview()"
+                  class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-transparent text-sm focus:ring-2 focus:ring-brand-500 outline-none font-mono"
+                  placeholder="bash, cmd, routes/web.php, .env"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >Isi Perintah / Skrip Kode</label
+              >
+              <textarea
+                id="snippet-code-text"
+                rows="4"
+                oninput="updateSnippetModalPreview()"
+                class="w-full px-3.5 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-900 text-slate-100 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none leading-relaxed"
+                placeholder='composer create-project laravel/laravel "event-kampus" "10.*"&#10;cd event-kampus'
+              ></textarea>
+            </div>
+
+            <div>
+              <label
+                class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1"
+                >Pratinjau Hasil</label
+              >
+              <div id="snippet-preview-container" class="scale-95 origin-top">
+                <!-- Live Preview Rendered Here -->
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="px-6 py-3.5 bg-slate-50 dark:bg-slate-700/40 border-t border-slate-200 dark:border-slate-700 flex items-center justify-end space-x-2"
+          >
+            <button
+              type="button"
+              onclick="closeSnippetModal()"
+              class="px-4 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition"
+            >
+              Batal
+            </button>
+            <button
+              type="button"
+              onclick="insertSnippetToTextarea()"
+              class="px-4 py-2 text-xs font-semibold rounded-xl bg-brand-600 hover:bg-brand-700 text-white transition flex items-center space-x-1.5 shadow-sm"
+            >
+              <i class="fa-solid fa-plus text-[10px]"></i>
+              <span>Sisipkan ke Editor</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const IS_PREVIEW = true; // Set false saat deploy ke GAS Web App
+      const GAS_URL = "ISI_DENGAN_URL_WEB_APP_GAS_ANDA";
+      const CURRICULUM_VERSION = "v_laravel_bootcamp_hmpsinf_13";
+
+      // Helper fungsi pembuat snippet box siap salin
+      function makeCodeBox(label, code) {
+        return `
+                <div class="code-snippet-box">
+                    <div class="code-snippet-header">
+                        <div class="flex items-center space-x-3">
+                            <div class="mac-dots">
+                                <span class="mac-dot red"></span>
+                                <span class="mac-dot yellow"></span>
+                                <span class="mac-dot green"></span>
+                            </div>
+                            <span class="text-xs font-mono font-medium text-slate-400 ml-1">${label}</span>
+                        </div>
+                        <button onclick="copyCodeSnippet(this)" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1.5 transition px-2.5 py-1 rounded-md hover:bg-slate-800">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Salin</span>
+                        </button>
+                    </div>
+                    <pre class="code-snippet-body"><code>${escapeHtml(code)}</code></pre>
+                </div>
+            `;
+      }
+
+      // Inisialisasi Database Kurikulum Bootcamp Laravel Lengkap
+      if (
+        localStorage.getItem("bootcamp_curriculum_ver") !== CURRICULUM_VERSION
+      ) {
+        const initialModules = [
+          {
+            id: "mod-0",
+            kategori: "Pendahuluan",
+            judul_materi: "Pengenalan & Arsitektur Aplikasi",
+            deskripsi:
+              "Mengenal tujuan bootcamp dan gambaran proyek CRUD Event Kampus.",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "mod-1",
+            kategori: "Sesi 1: Setup Project & Template",
+            judul_materi: "Instalasi Laravel 10 & Template SB Admin 2",
+            deskripsi:
+              "Instalasi framework, konfigurasi koneksi database, dan pembuatan layout master.",
+            urutan: "2",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "mod-2",
+            kategori: "Sesi 2: Database",
+            judul_materi: "Migration, Model, & Data Dummy Seeder",
+            deskripsi:
+              "Merancang struktur tabel events, mass assignment, dan seeding data contoh.",
+            urutan: "3",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "mod-3",
+            kategori: "Sesi 3: Route & Controller",
+            judul_materi: "Resource Controller & Routing Dinamis",
+            deskripsi:
+              "Menghubungkan URL browser dengan method pengelolaan data di Laravel.",
+            urutan: "4",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "mod-4",
+            kategori: "Sesi 4: Membuat Tampilan (Views)",
+            judul_materi: "Blade Template, Form Partial & CRUD Lengkap",
+            deskripsi:
+              "Implementasi index, upload gambar, form create/edit, detail show, dan konfirmasi SweetAlert.",
+            urutan: "5",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "mod-5",
+            kategori: "Hasil Akhir",
+            judul_materi: "Pengujian Sistem & Tantangan Lanjutan",
+            deskripsi:
+              "Menjalankan aplikasi lokal dan eksplorasi fitur opsional.",
+            urutan: "6",
+            created_at: new Date().toISOString(),
+          },
+        ];
+
+        const initialLessons = [
+          // PENDAHULUAN
+          {
+            id: "les-0-1",
+            module_id: "mod-0",
+            judul_sub: "Selamat Datang, Peserta!",
+            konten_html: `
+                        <div class="mb-6 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 p-6 border border-indigo-100 dark:border-indigo-900/60">
+                            <h2 class="mb-3 flex items-center gap-2 text-xl font-bold text-slate-900 dark:text-slate-100">
+                                <i class="fa-solid fa-hand text-brand-600"></i> Selamat Datang di Bootcamp Laravel!
+                            </h2>
+                            <p class="mb-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                                Pada sesi ini, kamu akan belajar membangun sebuah <strong>CRUD Event Kampus</strong> — sebuah Admin Panel yang berfungsi mengelola data acara kampus secara dinamis dari nol hingga fitur lengkap.
+                            </p>
+                            <p class="mb-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+                                Ikuti setiap langkah secara berurutan sambil mendengarkan penjelasan dari instruktur. Ketik setiap baris kode secara mandiri (kecuali kode starter yang disediakan tombol salin) agar kamu benar-benar memahami alur kerjanya.
+                            </p>
+                            <div class="pt-2">
+                                <p class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 mb-2">Fitur Utama yang Akan Kamu Bangun:</p>
+                                <ul class="list-disc ml-5 space-y-1 text-sm text-slate-600 dark:text-slate-300">
+                                    <li>Tampilan tabel data modern dengan <strong>Pagination</strong></li>
+                                    <li>Upload Gambar (Poster Acara/Event) ke Storage</li>
+                                    <li>Validasi form aman & pesan error interaktif</li>
+                                    <li>Konfirmasi hapus interaktif dengan <strong>SweetAlert2</strong></li>
+                                </ul>
+                            </div>
+                        </div>
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          // SESI 1
+          {
+            id: "les-1-1",
+            module_id: "mod-1",
+            judul_sub: "1.1 Buat Project Laravel",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka terminal atau Command Prompt di komputer kamu, lalu jalankan perintah berikut untuk membuat project Laravel baru. Ini akan membuat folder project bernama <code>event-kampus</code> dan secara otomatis menginstall semua dependensi yang diperlukan.</p>
+                        ${makeCodeBox("bash", `composer create-project laravel/laravel "event-kampus" "10.*" --no-security-blocking\ncd event-kampus`)}
+                        <p class="text-slate-500 dark:text-slate-400 text-xs mt-2">Pastikan koneksi internet stabil saat menjalankan Composer untuk pertama kali.</p>
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-1-2",
+            module_id: "mod-1",
+            judul_sub: "1.2 Konfigurasi Database & Lingkungan",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka aplikasi <strong>phpMyAdmin</strong> melalui <strong>Laragon</strong> atau XAMPP kamu, lalu buat satu database baru dengan nama:</p>
+                        <div class="my-3 inline-block rounded-xl bg-slate-100 dark:bg-slate-750 px-4 py-2 text-sm font-bold text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
+                            event_kampus
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 mt-2">Selanjutnya, buka file <code>.env</code> yang ada di dalam root folder project Laravel kamu. Cari bagian <em>Database Connection</em> dan sesuaikan konfigurasinya menjadi seperti berikut:</p>
+                        ${makeCodeBox(".env", `DB_CONNECTION=mysql\nDB_HOST=127.0.0.1\nDB_PORT=3306\nDB_DATABASE=event_kampus\nDB_USERNAME=root\nDB_PASSWORD=`)}
+                        <div class="my-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs sm:text-sm text-emerald-800 dark:text-emerald-300 flex items-start space-x-2.5">
+                            <i class="fa-solid fa-circle-check mt-0.5 text-emerald-500"></i>
+                            <span>Pastikan MySQL di Laragon sudah dalam keadaan <strong>Running</strong>, dan sesuaikan <code>DB_USERNAME</code> serta <code>DB_PASSWORD</code> jika kamu menggunakan password root khusus.</span>
+                        </div>
+                    `,
+            video_url: "",
+            urutan: "2",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-1-3",
+            module_id: "mod-1",
+            judul_sub: "1.3 Integrasi Template SB Admin 2",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Untuk membuat tampilan admin yang rapi dan profesional, kita menggunakan template siap pakai bernama <strong>SB Admin 2</strong>.</p>
+                        <a href="https://startbootstrap.com/previews/sb-admin-2#google_vignette" target="_blank" rel="noopener noreferrer" class="my-4 p-4 rounded-2xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800/60 flex items-center justify-between hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 rounded-xl bg-brand-600 text-white flex items-center justify-center text-lg">
+                                    <i class="fa-solid fa-file-zipper"></i>
+                                </div>
+                                <div>
+                                    
+                                    <div class="text-sm font-bold text-slate-800 dark:text-slate-100">Asset Template SB Admin 2</div>
+                                    <div class="text-xs text-brand-600 dark:text-brand-400">Download sbadmin zip</div>
+                                </div>
+                            </div>
+                            <span class="text-xs font-semibold px-3 py-1.5 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">Siap Diekstrak</span>
+                        </a>
+                        <p class="text-slate-600 dark:text-slate-300 font-semibold mb-2">Langkah Penempatan Asset:</p>
+                        <ol class="list-decimal ml-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                            <li><strong>Ekstrak file ZIP</strong> — Di dalamnya terdapat folder <code>css/</code>, <code>js/</code>, dan <code>vendor/</code>.</li>
+                            <li><strong>Salin ke Folder Public</strong> — Pindahkan ketiga folder tersebut ke dalam folder <code>public/</code> di project Laravel kamu.</li>
+                        </ol>
+                    `,
+            video_url: "",
+            urutan: "3",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-1-4",
+            module_id: "mod-1",
+            judul_sub: "1.4 Buat Layout Master (admin.blade.php)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buat file baru di <code>resources/views/layouts/admin.blade.php</code>. File ini akan menjadi “kerangka utama” (sidebar, topbar navbar, dan footer) yang membungkus semua halaman aplikasi:</p>
+                        ${makeCodeBox(
+                          "resources/views/layouts/admin.blade.php",
+                          `<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Event Kampus | @yield('title', 'Dashboard')</title>
+
+    {{-- SB Admin 2 CSS --}}
+    <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
+
+    {{-- Custom CSS untuk reduce sidebar spacing --}}
+    <style>
+        body,
+        html {
+            font-family: 'Outfit', sans-serif !important;
+        }
+
+        @media (min-width: 768px) {
+            .sidebar .nav-item .nav-link {
+                padding: 0.5rem 1rem !important;
+            }
+        }
+
+        .sidebar .nav-item {
+            margin-bottom: 0 !important;
+        }
+
+        .sidebar-brand {
+            justify-content: flex-start !important;
+        }
+
+        .sidebar-brand-text {
+            font-size: 0.85rem !important;
+        }
+
+        .sidebar.toggled .sidebar-brand {
+            justify-content: center !important;
+        }
+
+        .topbar {
+            box-shadow: none !important;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #e3e6f0 !important;
+        }
+
+        .table-responsive {
+            border: 1px solid #e3e6f0;
+        }
+    </style>
+</head>
+
+<body id="page-top">
+    <div id="wrapper">
+
+        {{-- ===== SIDEBAR ===== --}}
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <a class="sidebar-brand d-flex align-items-center" href="{{ url('/') }}">
+                <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-calendar-check"></i></div>
+                <div class="sidebar-brand-text mx-3">Event Kampus</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ url('/') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Dashboard</span></a>
+            </li>
+
+
+            <hr class="sidebar-divider">
+            <div class="sidebar-heading">Data Master</div>
+
+            <li class="nav-item {{ request()->routeIs('events.*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('events.index') }}">
+                    <i class="fas fa-fw fa-calendar-alt"></i><span>Event</span>
+                </a>
+            </li>
+            <hr class="sidebar-divider d-none d-md-block">
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
+
+
+        </ul>
+
+        {{-- ===== CONTENT WRAPPER ===== --}}
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                {{-- TOPBAR --}}
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top">
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3"><i
+                            class="fa fa-bars"></i></button>
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Administrator</span>
+                                <img class="img-profile rounded-circle"
+                                    src="https://ui-avatars.com/api/?name=Admin&color=7F9CF5&background=EBF4FF">
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+                {{-- MAIN CONTENT --}}
+                <div class="container-fluid">
+                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                        <h1 class="h3 mb-0 text-gray-800">@yield('title', 'Dashboard')</h1>
+                        @yield('action-button')
+                    </div>
+
+                    {{-- DYNAMIC CONTENT DARI BLADE LAIN --}}
+                    @yield('content')
+                </div>
+            </div>
+
+            {{-- Footer --}}
+            <footer class="sticky-footer bg-white">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Event Kampus &copy; {{ date('Y') }}</span>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    {{-- JS Scripts --}}
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"><\/script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"><\/script>
+    <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"><\/script>
+    <script src="{{ asset('js/sb-admin-2.min.js') }}"><\/script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"><\/script>
+
+    <script>
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('success') }}',
+                showConfirmButton: false,
+                timer: 2000
+            });
+        @endif
+
+        // Script konfirmasi hapus otomatis untuk tombol class .btn-delete
+        $('.btn-delete').on('click', function(e) {
+            e.preventDefault();
+            let form = $(this).closest('form');
+            Swal.fire({
+                title: 'Yakin hapus data?',
+                text: "Data yang dihapus tidak bisa dikembalikan!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#e74a3b',
+                cancelButtonColor: '#858796',
+                confirmButtonText: 'Ya, Hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) form.submit();
+            })
+        });
+    <\/script>
+</body>
+
+</html>`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "4",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-1-5",
+            module_id: "mod-1",
+            judul_sub: "1.5 Link Storage (Untuk Upload Gambar)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Agar gambar poster event yang nanti di-upload dapat diakses melalui URL public, jalankan perintah storage link di terminal kamu:</p>
+                        ${makeCodeBox("bash", `php artisan storage:link`)}
+                        <p class="text-xs text-slate-400 mt-2">Perintah ini akan membuat symlink dari folder <code>storage/app/public</code> ke folder <code>public/storage</code>.</p>
+                    `,
+            video_url: "",
+            urutan: "5",
+            created_at: new Date().toISOString(),
+          },
+          // SESI 2
+          {
+            id: "les-2-1",
+            module_id: "mod-2",
+            judul_sub: "2.1 Buat Migration & Model",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Jalankan perintah berikut untuk membuat Model <code>Event</code> beserta file migrasi tabelnya secara otomatis. Opsi <code>-m</code> menginstruksikan Laravel untuk sekaligus membuat file migration.</p>
+                        ${makeCodeBox("bash", `php artisan make:model Event -m`)}
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-2-2",
+            module_id: "mod-2",
+            judul_sub: "2.2 Atur Struktur Tabel (Migration)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka folder <code>database/migrations/</code> dan buka file <code>xxxx_xx_xx_create_events_table.php</code>. Ubah isi method <code>up()</code> menjadi seperti berikut:</p>
+                        ${makeCodeBox(
+                          "database/migrations/xxxx_create_events_table.php",
+                          `public function up(): void
+{
+    Schema::create('events', function (Blueprint $table) {
+        $table->id();
+        $table->string('nama_event');
+        $table->string('poster')->nullable();
+        $table->text('deskripsi')->nullable();
+        $table->date('tanggal');
+        $table->string('tempat');
+        $table->integer('kuota');
+        $table->integer('peserta_terdaftar')->default(0);
+        $table->timestamps();
+    });
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-4">Setelah selesai menyusun kolom, jalankan migrasi untuk membuat tabel di MySQL:</p>
+                        ${makeCodeBox("bash", `php artisan migrate`)}
+                    `,
+            video_url: "",
+            urutan: "2",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-2-3",
+            module_id: "mod-2",
+            judul_sub: "2.3 Atur Mass Assignment (Model)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka file <code>app/Models/Event.php</code>. Tambahkan properti <code>$fillable</code> agar Laravel mengizinkan proses penyimpanan data secara massal (Mass Assignment):</p>
+                        ${makeCodeBox(
+                          "app/Models/Event.php",
+                          `<?php
+
+namespace App\\Models;
+
+use Illuminate\\Database\\Eloquent\\Factories\\HasFactory;
+use Illuminate\\Database\\Eloquent\\Model;
+
+class Event extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'nama_event',
+        'poster',
+        'deskripsi',
+        'tanggal',
+        'tempat',
+        'kuota',
+        'peserta_terdaftar'
+    ];
+}`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "3",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-2-4",
+            module_id: "mod-2",
+            judul_sub: "2.4 Buat Data Dummy (Seeder)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buat file seeder untuk mengisi data contoh ke tabel secara otomatis:</p>
+                        ${makeCodeBox("bash", `php artisan make:seeder EventSeeder`)}
+                        <p class="text-slate-600 dark:text-slate-300 mt-3">Buka file <code>database/seeders/EventSeeder.php</code> dan isi dengan kode berikut:</p>
+                        ${makeCodeBox(
+                          "database/seeders/EventSeeder.php",
+                          `<?php
+
+namespace Database\\Seeders;
+
+use Illuminate\\Database\\Seeder;
+use App\\Models\\Event;
+
+class EventSeeder extends Seeder
+{
+    public function run(): void
+    {
+        Event::create([
+            'nama_event' => 'Bootcamp Laravel Dasar',
+            'deskripsi' => 'Belajar membuat sistem informasi event kampus.',
+            'tanggal' => '2024-10-25',
+            'tempat' => 'Lab Komputer A',
+            'kuota' => 50,
+            'peserta_terdaftar' => 10,
+            'poster' => 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=500&q=80',
+        ]);
+
+        Event::create([
+            'nama_event' => 'Workshop UI/UX Design',
+            'deskripsi' => 'Mengenal dasar-dasar desain antarmuka.',
+            'tanggal' => '2024-10-28',
+            'tempat' => 'Aula Utama',
+            'kuota' => 100,
+            'peserta_terdaftar' => 100,
+            'poster' => 'https://images.unsplash.com/photo-1558655146-d09347e92766?w=500&q=80',
+        ]);
+    }
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-3">Daftarkan seeder ke dalam <code>database/seeders/DatabaseSeeder.php</code>:</p>
+                        ${makeCodeBox(
+                          "database/seeders/DatabaseSeeder.php",
+                          `<?php
+
+namespace Database\\Seeders;
+
+use Illuminate\\Database\\Seeder;
+
+class DatabaseSeeder extends Seeder
+{
+    public function run(): void
+    {
+        $this->call([
+            EventSeeder::class,
+        ]);
+    }
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-3">Jalankan Seeder untuk mengisi data awal ke MySQL:</p>
+                        ${makeCodeBox("bash", `php artisan db:seed`)}
+                    `,
+            video_url: "",
+            urutan: "4",
+            created_at: new Date().toISOString(),
+          },
+          // SESI 3
+          {
+            id: "les-3-1",
+            module_id: "mod-3",
+            judul_sub: "3.1 Buat Controller Resource",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Gunakan opsi <code>--resource</code> untuk membuat controller yang langsung menyediakan 7 method CRUD (index, create, store, show, edit, update, destroy):</p>
+                        ${makeCodeBox("bash", `php artisan make:controller EventController --resource`)}
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-3-2",
+            module_id: "mod-3",
+            judul_sub: "3.2 Setup Route (routes/web.php)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka file <code>routes/web.php</code> dan ganti isinya dengan konfigurasi Route resource berikut:</p>
+                        ${makeCodeBox(
+                          "routes/web.php",
+                          `<?php
+
+use Illuminate\\Support\\Facades\\Route;
+use App\\Http\\Controllers\\EventController;
+
+// Arahkan halaman root utama langsung ke index events
+Route::get('/', function () {
+    return redirect()->route('events.index');
+});
+
+Route::resource('events', EventController::class);`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "2",
+            created_at: new Date().toISOString(),
+          },
+          // SESI 4
+          {
+            id: "les-4-1",
+            module_id: "mod-4",
+            judul_sub: "4.1 Menampilkan Daftar Event (Index)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Buka <code>app/Http/Controllers/EventController.php</code> dan perbarui method <code>index()</code>:</p>
+                        ${makeCodeBox(
+                          "EventController.php -> index()",
+                          `use App\\Models\\Event;
+
+public function index()
+{
+    $events = Event::latest()->paginate(10);
+    return view('events.index', compact('events'));
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-4">Buat file view di <code>resources/views/events/index.blade.php</code>:</p>
+                        ${makeCodeBox(
+                          "resources/views/events/index.blade.php",
+                          `@extends('layouts.admin')
+
+@section('title', 'Data Event')
+
+@section('action-button')
+    <a href="{{ route('events.create') }}" class="btn btn-primary btn-sm">
+        <i class="fas fa-plus fa-sm text-white-50 mr-1"></i> Tambah Event
+    </a>
+@endsection
+
+@section('content')
+<div class="card border mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Daftar Event</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover" width="100%" cellspacing="0">
+                <thead class="thead-light">
+                    <tr>
+                        <th width="5%">#</th>
+                        <th width="10%">Poster</th>
+                        <th>Nama Event</th>
+                        <th>Tanggal</th>
+                        <th>Tempat</th>
+                        <th width="10%">Kuota</th>
+                        <th width="10%">Daftar</th>
+                        <th width="18%">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($events as $event)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td class="text-center">
+                            @if($event->poster)
+                                <img src="{{ asset('storage/posters/' . $event->poster) }}" alt="Poster" class="img-thumbnail" width="50">
+                            @else
+                                <span class="text-muted small">Tidak ada</span>
+                            @endif
+                        </td>
+                        <td>{{ $event->nama_event }}</td>
+                        <td>{{ \\Carbon\\Carbon::parse($event->tanggal)->locale('id')->isoFormat('dddd, DD MMM YYYY') }}</td>
+                        <td>{{ $event->tempat }}</td>
+                        <td class="text-center">{{ $event->kuota }}</td>
+                        <td class="text-center">
+                            <span class="badge badge-{{ $event->peserta_terdaftar >= $event->kuota ? 'danger' : 'success' }}">
+                                {{ $event->peserta_terdaftar }}/{{ $event->kuota }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{{ route('events.show', $event) }}" class="btn btn-info btn-sm"><i class="fas fa-eye"></i></a>
+                            <a href="{{ route('events.edit', $event) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+                            <form action="{{ route('events.destroy', $event) }}" method="POST" class="d-inline">
+                                @csrf @method('DELETE')
+                                <button class="btn btn-danger btn-sm btn-delete" type="submit"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="8" class="text-center text-muted">Belum ada event. Tambahkan Sekarang</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-end mt-3 ml-3">
+            {{ $events->links('pagination::bootstrap-5') }}
+        </div>
+    </div>
+</div>
+@endsection`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-4-2",
+            module_id: "mod-4",
+            judul_sub: "4.2 Form Input Dinamis (_form.blade.php)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Karena form Tambah dan Edit memiliki field yang identik, kita buat satu file partial agar menerapkan prinsip DRY (Don't Repeat Yourself). Buat file <code>resources/views/events/_form.blade.php</code>:</p>
+                        ${makeCodeBox(
+                          "resources/views/events/_form.blade.php",
+                          `<div class="row">
+    <div class="col-md-8">
+        <div class="form-group">
+            <label for="nama_event">Nama Event <span class="text-danger">*</span></label>
+            <input type="text" name="nama_event" id="nama_event"
+                class="form-control @error('nama_event') is-invalid @enderror"
+                value="{{ old('nama_event', $event->nama_event ?? '') }}"
+                placeholder="Contoh: Seminar Nasional IT 2024">
+            @error('nama_event')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="form-group">
+            <label for="tanggal">Tanggal <span class="text-danger">*</span></label>
+            <input type="date" name="tanggal" id="tanggal" class="form-control @error('tanggal') is-invalid @enderror"
+                value="{{ old('tanggal', $event->tanggal ?? '') }}">
+            @error('tanggal')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label for="tempat">Tempat <span class="text-danger">*</span></label>
+            <input type="text" name="tempat" id="tempat" class="form-control @error('tempat') is-invalid @enderror"
+                value="{{ old('tempat', $event->tempat ?? '') }}" placeholder="Contoh: Aula Gedung A">
+            @error('tempat')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="kuota">Kuota <span class="text-danger">*</span></label>
+            <input type="number" name="kuota" id="kuota" class="form-control @error('kuota') is-invalid @enderror"
+                value="{{ old('kuota', $event->kuota ?? '') }}" min="1" placeholder="100">
+            @error('kuota')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="peserta_terdaftar">Pendaftar</label>
+            <input type="number" name="peserta_terdaftar" id="peserta_terdaftar" class="form-control @error('peserta_terdaftar') is-invalid @enderror"
+                value="{{ old('peserta_terdaftar', $event->peserta_terdaftar ?? '0') }}" min="0" placeholder="0">
+            @error('peserta_terdaftar')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="deskripsi">Deskripsi</label>
+            <textarea name="deskripsi" id="deskripsi" rows="3"
+                class="form-control @error('deskripsi') is-invalid @enderror"
+                placeholder="Deskripsi singkat event...">{{ old('deskripsi', $event->deskripsi ?? '') }}</textarea>
+            @error('deskripsi')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group">
+            <label for="poster">Poster Event <small class="text-muted">(Opsional, Format: JPG,PNG,JPEG | Max 2MB)</small></label>
+            <input type="file" name="poster" id="poster" class="form-control-file @error('poster') is-invalid @enderror" accept="image/*">
+            @error('poster')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+            @if($event->poster ?? false)
+                <div class="mt-2">
+                    <img src="{{ asset('storage/posters/' . $event->poster) }}" alt="Poster" class="img-thumbnail" width="150">
+                </div>
+            @endif
+        </div>
+    </div>
+</div>`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "2",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-4-3",
+            module_id: "mod-4",
+            judul_sub: "4.3 Simpan Data (Create & Store)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Kembali ke <code>EventController.php</code>, update method <code>create()</code> dan <code>store()</code>:</p>
+                        ${makeCodeBox(
+                          "EventController.php -> create() & store()",
+                          `use App\\Models\\Event;
+use Illuminate\\Http\\Request;
+
+public function create()
+{
+    return view('events.create');
+}
+
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'nama_event' => 'required|string|max:255',
+        'poster'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'tanggal'    => 'required|date',
+        'tempat'     => 'required|string',
+        'kuota'      => 'required|integer|min:1',
+        'peserta_terdaftar' => 'nullable|integer|min:0',
+        'deskripsi'  => 'nullable|string',
+    ]);
+
+    if ($request->hasFile('poster')) {
+        $image = $request->file('poster');
+        $image->storeAs('public/posters', $image->hashName());
+        $validated['poster'] = $image->hashName();
+    }
+
+    Event::create($validated);
+    return redirect()->route('events.index')->with('success', 'Event berhasil ditambahkan!');
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-4">Buat file <code>resources/views/events/create.blade.php</code>:</p>
+                        ${makeCodeBox(
+                          "resources/views/events/create.blade.php",
+                          `@extends('layouts.admin')
+
+@section('title', 'Tambah Event')
+
+@section('content')
+<div class="card border mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Form Tambah Event</h6>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('events.store') }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @include('events._form')
+            
+            <a href="{{ route('events.index') }}" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save mr-1"></i> Simpan
+            </button>
+        </form>
+    </div>
+</div>
+@endsection`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "3",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-4-4",
+            module_id: "mod-4",
+            judul_sub: "4.4 Detail Event (Show)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Update method <code>show()</code> di <code>EventController.php</code>:</p>
+                        ${makeCodeBox(
+                          "EventController.php -> show()",
+                          `use App\\Models\\Event;
+
+public function show(Event $event)
+{
+    return view('events.show', compact('event'));
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-4">Buat file view <code>resources/views/events/show.blade.php</code>:</p>
+                        ${makeCodeBox(
+                          "resources/views/events/show.blade.php",
+                          `@extends('layouts.admin')
+
+@section('title', 'Detail Event')
+
+@section('action-button')
+    <a href="{{ route('events.index') }}" class="btn btn-secondary btn-sm">
+        <i class="fas fa-arrow-left fa-sm text-white-50 mr-1"></i> Kembali
+    </a>
+@endsection
+
+@section('content')
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card border mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Poster Event</h6>
+            </div>
+            <div class="card-body text-center">
+                @if($event->poster)
+                    <img src="{{ asset('storage/posters/' . $event->poster) }}" alt="Poster" class="img-fluid rounded mb-3" style="max-height: 250px;">
+                @else
+                    <div class="bg-light rounded p-4 mb-3 text-muted">
+                        <i class="fas fa-image fa-3x mb-2"></i><br>Tidak ada poster
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card border mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Informasi Event</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-borderless mb-0">
+                    <tr>
+                        <th width="25%">Nama Event</th>
+                        <td>{{ $event->nama_event }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tanggal</th>
+                        <td>{{ \\Carbon\\Carbon::parse($event->tanggal)->locale('id')->isoFormat('dddd, DD MMMM YYYY') }}</td>
+                    </tr>
+                    <tr>
+                        <th>Tempat</th>
+                        <td>{{ $event->tempat }}</td>
+                    </tr>
+                    <tr>
+                        <th>Kuota</th>
+                        <td><span class="badge badge-primary">{{ $event->kuota }} orang</span></td>
+                    </tr>
+                    <tr>
+                        <th>Pendaftar</th>
+                        <td><span class="badge badge-{{ $event->peserta_terdaftar >= $event->kuota ? 'danger' : 'success' }}">{{ $event->peserta_terdaftar }} orang</span></td>
+                    </tr>
+                    <tr>
+                        <th>Deskripsi</th>
+                        <td>{{ $event->deskripsi ?? '-' }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="{{ route('events.edit', $event) }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-edit mr-1"></i> Edit
+                </a>
+                <form action="{{ route('events.destroy', $event) }}" method="POST" class="d-inline">
+                    @csrf @method('DELETE')
+                    <button class="btn btn-danger btn-sm btn-delete" type="submit">
+                        <i class="fas fa-trash mr-1"></i> Hapus
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "4",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "les-4-5",
+            module_id: "mod-4",
+            judul_sub: "4.5 Edit & Hapus (Update & Destroy)",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Lengkapi method <code>edit()</code>, <code>update()</code>, dan <code>destroy()</code> pada <code>EventController.php</code>:</p>
+                        ${makeCodeBox(
+                          "EventController.php -> edit(), update(), destroy()",
+                          `use App\\Models\\Event;
+use Illuminate\\Http\\Request;
+use Illuminate\\Support\\Facades\\Storage;
+
+public function edit(Event $event)
+{
+    return view('events.edit', compact('event'));
+}
+
+public function update(Request $request, Event $event)
+{
+    $validated = $request->validate([
+        'nama_event' => 'required|string|max:255',
+        'poster'     => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        'tanggal'    => 'required|date',
+        'tempat'     => 'required|string',
+        'kuota'      => 'required|integer|min:1',
+        'peserta_terdaftar' => 'nullable|integer|min:0',
+        'deskripsi'  => 'nullable|string',
+    ]);
+
+    if ($request->hasFile('poster')) {
+        if ($event->poster) {
+            Storage::disk('public')->delete('posters/' . $event->poster);
+        }
+        $image = $request->file('poster');
+        $image->storeAs('public/posters', $image->hashName());
+        $validated['poster'] = $image->hashName();
+    }
+
+    $event->update($validated);
+    return redirect()->route('events.index')->with('success', 'Event berhasil diperbarui!');
+}
+
+public function destroy(Event $event)
+{
+    if ($event->poster) {
+        Storage::disk('public')->delete('posters/' . $event->poster);
+    }
+    $event->delete();
+    return redirect()->route('events.index')->with('success', 'Event dihapus!');
+}`,
+                        )}
+                        <p class="text-slate-600 dark:text-slate-300 mt-4">Buat file view <code>resources/views/events/edit.blade.php</code>:</p>
+                        ${makeCodeBox(
+                          "resources/views/events/edit.blade.php",
+                          `@extends('layouts.admin')
+
+@section('title', 'Edit Event')
+
+@section('content')
+<div class="card border mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-warning">Form Edit Event</h6>
+    </div>
+    <div class="card-body">
+        <form action="{{ route('events.update', $event) }}" method="POST" enctype="multipart/form-data">
+            @csrf 
+            @method('PUT')
+            
+            @include('events._form')
+            
+            <a href="{{ route('events.index') }}" class="btn btn-secondary">Batal</a>
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-sync mr-1"></i> Update
+            </button>
+        </form>
+    </div>
+</div>
+@endsection`,
+                        )}
+                    `,
+            video_url: "",
+            urutan: "5",
+            created_at: new Date().toISOString(),
+          },
+          // HASIL AKHIR
+          {
+            id: "les-5-1",
+            module_id: "mod-5",
+            judul_sub: "Hasil Akhir & Menjalankan Server",
+            konten_html: `
+                        <p class="text-slate-600 dark:text-slate-300">Selamat! Kamu sudah berhasil membangun aplikasi <strong>Sistem Manajemen Event Kampus</strong> dengan fitur CRUD lengkap. Sekarang jalankan server lokal untuk melihat hasilnya:</p>
+                        ${makeCodeBox("bash", `php artisan serve`)}
+                        <p class="text-slate-600 dark:text-slate-300 mt-3">Buka browser kamu dan navigasi ke alamat:</p>
+                        <div class="my-3 inline-block rounded-xl bg-slate-100 dark:bg-slate-750 px-4 py-2 font-mono text-sm font-bold text-brand-600 dark:text-brand-400 border border-slate-200 dark:border-slate-700">
+                            http://127.0.0.1:8000
+                        </div>
+                        <p class="text-slate-600 dark:text-slate-300 mt-3">Jika semua langkah sudah benar, halaman <strong>Data Event</strong> akan tampil seperti ini:</p>
+                        <figure class="my-4">
+                            <a href="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8O1Jou4Sn2KfiYDv6PYhTSBXzfDqrP6Iuw6t6CpRL_c4pWpq6XDAoRQa2t2Toy5NL5zPR_aNMDtLFOVVrEOQHbKVbwTVBajipaYxnJ__fLnepRanFpgEazhTBNcvxhQevMO8m92BKJqpvOxOCb8qGiQMbxV5GVIn3XI3sAPJBqylxjv837oBw9ZUgJ9Rw/s1600/Hasil%20Akhir.png" target="_blank" rel="noopener">
+                                <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg8O1Jou4Sn2KfiYDv6PYhTSBXzfDqrP6Iuw6t6CpRL_c4pWpq6XDAoRQa2t2Toy5NL5zPR_aNMDtLFOVVrEOQHbKVbwTVBajipaYxnJ__fLnepRanFpgEazhTBNcvxhQevMO8m92BKJqpvOxOCb8qGiQMbxV5GVIn3XI3sAPJBqylxjv837oBw9ZUgJ9Rw/s1600/Hasil%20Akhir.png" alt="Tampilan halaman Data Event: sidebar Event Kampus, tabel daftar event dengan poster, tanggal, tempat, kuota, dan tombol aksi" loading="lazy" referrerpolicy="no-referrer" class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 shadow-lg">
+                            </a>
+                            <figcaption class="mt-2 text-xs text-center text-slate-400">Tampilan hasil akhir aplikasi Event Kampus (klik untuk memperbesar)</figcaption>
+                        </figure>
+                        <div class="mt-6 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 p-6 border border-emerald-200 dark:border-emerald-800">
+                            <h4 class="mb-3 flex items-center gap-2 text-base font-bold text-emerald-800 dark:text-emerald-300">
+                                <i class="fa-solid fa-circle-check text-emerald-500"></i> Fitur yang Sudah Kamu Selesaikan:
+                            </h4>
+                            <ul class="ml-5 list-disc space-y-1.5 text-xs sm:text-sm text-emerald-700 dark:text-emerald-400">
+                                <li>CRUD lengkap (Create, Read, Update, Delete) untuk data Event</li>
+                                <li>Upload gambar poster event ke filesystem & database</li>
+                                <li>Tampilan tabel dinamis dengan Bootstrap Pagination</li>
+                                <li>Validasi form input & proteksi serangan CSRF</li>
+                                <li>Konfirmasi hapus interaktif menggunakan SweetAlert2</li>
+                                <li>Template dashboard modern dengan SB Admin 2</li>
+                            </ul>
+                        </div>
+                    `,
+            video_url: "",
+            urutan: "1",
+            created_at: new Date().toISOString(),
+          },
+        ];
+
+        localStorage.setItem("mock_modules", JSON.stringify(initialModules));
+        localStorage.setItem("mock_lessons", JSON.stringify(initialLessons));
+        localStorage.setItem("bootcamp_curriculum_ver", CURRICULUM_VERSION);
+        localStorage.removeItem("bootcamp_curriculum_cache");
+      }
+
+      if (!localStorage.getItem("mock_users")) {
+        const initialUsers = [
+          {
+            id: "1",
+            username: "admin",
+            password: "adminpassword",
+            role: "admin",
+            created_at: new Date().toISOString(),
+          },
+          {
+            id: "2",
+            username: "peserta",
+            password: "user123",
+            role: "user",
+            created_at: new Date().toISOString(),
+          },
+        ];
+        localStorage.setItem("mock_users", JSON.stringify(initialUsers));
+      }
+
+      async function apiCall(action, payload = {}) {
+        if (IS_PREVIEW) {
+          return await handleMockAPI(action, payload);
+        }
+        try {
+          const res = await fetch(GAS_URL, {
+            method: "POST",
+            redirect: "follow",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action, payload }),
+          });
+          return await res.json();
+        } catch (err) {
+          return {
+            status: "error",
+            message: "Koneksi GAS Gagal: " + err.message,
+          };
+        }
+      }
+
+      async function handleMockAPI(action, payload) {
+        await new Promise((r) => setTimeout(r, 100)); // Simulasi jeda latensi minimal
+
+        let modules = JSON.parse(localStorage.getItem("mock_modules")) || [];
+        let lessons = JSON.parse(localStorage.getItem("mock_lessons")) || [];
+        let users = JSON.parse(localStorage.getItem("mock_users")) || [];
+
+        switch (action) {
+          case "login":
+            const found = users.find(
+              (u) =>
+                u.username === payload.username &&
+                u.password === payload.password,
+            );
+            if (found) {
+              return {
+                status: "success",
+                message: "Login Berhasil",
+                data: {
+                  id: found.id,
+                  username: found.username,
+                  role: found.role,
+                },
+              };
+            }
+            return {
+              status: "error",
+              message: "Username atau password salah!",
+            };
+
+          case "getAll":
+            return {
+              status: "success",
+              message: "Data berhasil dimuat",
+              data: { modules: modules, lessons: lessons },
+            };
+
+          case "create":
+            if (payload.type === "module") {
+              const newMod = {
+                id: "mod-" + Date.now(),
+                kategori: payload.kategori,
+                judul_materi: payload.judul_materi,
+                deskripsi: payload.deskripsi || "",
+                urutan: payload.urutan || "1",
+                created_at: new Date().toISOString(),
+              };
+              modules.push(newMod);
+              localStorage.setItem("mock_modules", JSON.stringify(modules));
+            } else if (payload.type === "lesson") {
+              const newLes = {
+                id: "les-" + Date.now(),
+                module_id: payload.module_id,
+                judul_sub: payload.judul_sub,
+                konten_html: payload.konten_html,
+                video_url: payload.video_url || "",
+                urutan: payload.urutan || "1",
+                created_at: new Date().toISOString(),
+              };
+              lessons.push(newLes);
+              localStorage.setItem("mock_lessons", JSON.stringify(lessons));
+            }
+            return {
+              status: "success",
+              message: "Data baru berhasil ditambahkan!",
+            };
+
+          case "update":
+            if (payload.type === "module") {
+              const idx = modules.findIndex((m) => m.id === payload.id);
+              if (idx !== -1) {
+                modules[idx] = { ...modules[idx], ...payload };
+                localStorage.setItem("mock_modules", JSON.stringify(modules));
+              }
+            } else if (payload.type === "lesson") {
+              const idx = lessons.findIndex((l) => l.id === payload.id);
+              if (idx !== -1) {
+                lessons[idx] = { ...lessons[idx], ...payload };
+                localStorage.setItem("mock_lessons", JSON.stringify(lessons));
+              }
+            }
+            return { status: "success", message: "Data berhasil diperbarui!" };
+
+          case "delete":
+            if (payload.type === "module") {
+              modules = modules.filter((m) => m.id !== payload.id);
+              lessons = lessons.filter((l) => l.module_id !== payload.id);
+              localStorage.setItem("mock_modules", JSON.stringify(modules));
+              localStorage.setItem("mock_lessons", JSON.stringify(lessons));
+            } else if (payload.type === "lesson") {
+              lessons = lessons.filter((l) => l.id !== payload.id);
+              localStorage.setItem("mock_lessons", JSON.stringify(lessons));
+            }
+            return { status: "success", message: "Data berhasil dihapus!" };
+
+          default:
+            return {
+              status: "error",
+              message: "Action tidak dikenal: " + action,
+            };
+        }
+      }
+
+      // Global State
+      let globalData = { modules: [], lessons: [] };
+      let activeLessonId = null;
+      let completedLessons = JSON.parse(
+        localStorage.getItem("completed_lessons") || "[]",
+      );
+      let searchQuery = "";
+      let pendingDeleteTarget = null;
+      let activeSnippetTargetInput = "admin-les-konten";
+      const CACHE_KEY = "bootcamp_curriculum_cache";
+
+      document.addEventListener("DOMContentLoaded", () => {
+        initAppLifecycle();
+      });
+
+      function initAppLifecycle() {
+        updateThemeToggleButton();
+
+        // Periksa Sesi: Apakah user sudah login?
+        const session = JSON.parse(
+          localStorage.getItem("user_session") || "null",
+        );
+        checkSessionState();
+
+        if (session && session.username) {
+          // Pengguna terautentikasi: langsung ke Dashboard Belajar
+          switchView("dashboard");
+        } else {
+          // Pengguna publik: tampilkan Landing Page
+          switchView("landing");
+        }
+
+        // Muat data kurikulum dengan strategi Stale-While-Revalidate
+        loadCurriculumWithSWR();
+      }
+
+      function handleLogoClick() {
+        const session = JSON.parse(
+          localStorage.getItem("user_session") || "null",
+        );
+        if (session && session.username) {
+          switchView("dashboard");
+        } else {
+          switchView("landing");
+        }
+      }
+
+      async function loadCurriculumWithSWR() {
+        let cachedData = localStorage.getItem(CACHE_KEY);
+
+        // Jika cache belum ada, inisialisasi dari mock default lokal instan
+        if (!cachedData) {
+          const defaultModules = JSON.parse(
+            localStorage.getItem("mock_modules") || "[]",
+          );
+          const defaultLessons = JSON.parse(
+            localStorage.getItem("mock_lessons") || "[]",
+          );
+          if (defaultModules.length > 0) {
+            globalData = { modules: defaultModules, lessons: defaultLessons };
+            cachedData = JSON.stringify(globalData);
+            localStorage.setItem(CACHE_KEY, cachedData);
+          }
+        }
+
+        if (cachedData) {
+          try {
+            globalData = JSON.parse(cachedData);
+            renderLandingSyllabus();
+            renderSyllabus();
+            updateProgressStats();
+            autoOpenInitialLesson();
+          } catch (e) {
+            console.error("Gagal parse cache:", e);
+          }
+        }
+
+        // Sync latar belakang non-blocking
+        setSyncStatus(true, "Menyinkron...");
+        try {
+          const res = await apiCall("getAll");
+          if (res.status === "success" && res.data) {
+            const freshDataStr = JSON.stringify(res.data);
+            if (freshDataStr !== cachedData) {
+              globalData = res.data;
+              localStorage.setItem(CACHE_KEY, freshDataStr);
+              renderLandingSyllabus();
+              renderSyllabus();
+              updateProgressStats();
+              if (activeLessonId) {
+                const stillExists = (globalData.lessons || []).some(
+                  (l) => l.id === activeLessonId,
+                );
+                if (stillExists) selectLesson(activeLessonId);
+              } else {
+                autoOpenInitialLesson();
+              }
+            }
+            setSyncStatus(false, "Tersinkron");
+          } else {
+            setSyncStatus(false, "Offline / Lokal");
+          }
+        } catch (err) {
+          setSyncStatus(false, "Gagal Sinkron");
+        }
+      }
+
+      // Render Silabus pada Halaman Publik Landing Page (Materi Terkunci)
+      function renderLandingSyllabus() {
+        const container = document.getElementById("landing-syllabus-container");
+        if (!container) return;
+
+        if (!globalData.modules || globalData.modules.length === 0) {
+          container.innerHTML = `<div class="p-8 text-center text-xs text-slate-400">Silabus kurikulum sedang dipersiapkan.</div>`;
+          return;
+        }
+
+        let html = "";
+        globalData.modules.forEach((mod, idx) => {
+          const lessons = (globalData.lessons || []).filter(
+            (l) => l.module_id === mod.id,
+          );
+
+          html += `
+                    <div class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition">
+                        <div class="p-5 sm:p-6 bg-slate-50/50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div class="space-y-1">
+                                <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">${mod.kategori}</span>
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-100">${mod.judul_materi}</h3>
+                                ${mod.deskripsi ? `<p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">${mod.deskripsi}</p>` : ""}
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 text-xs font-semibold shrink-0">
+                                <i class="fa-regular fa-file-lines mr-1.5 text-slate-400"></i>${lessons.length} Sub-Materi
+                            </span>
+                        </div>
+
+                        <div class="p-4 sm:p-5 divide-y divide-slate-100 dark:divide-slate-700/50">
+                `;
+
+          if (lessons.length === 0) {
+            html += `<p class="text-xs text-slate-400 italic py-2 text-center">Materi segera hadir.</p>`;
+          } else {
+            lessons.forEach((les) => {
+              html += `
+                            <div class="py-3 flex items-center justify-between group hover:bg-slate-50 dark:hover:bg-slate-750 px-2 rounded-xl transition cursor-pointer" onclick="handleLockedLessonClick('${escapeHtml(les.judul_sub)}')">
+                                <div class="flex items-center space-x-3 truncate pr-4">
+                                    <span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-400 flex items-center justify-center text-xs group-hover:text-brand-600 transition shrink-0">
+                                        <i class="fa-solid fa-code"></i>
+                                    </span>
+                                    <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 truncate">${les.judul_sub}</span>
+                                </div>
+                                <span class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-semibold shrink-0 group-hover:bg-brand-50 group-hover:text-brand-600 dark:group-hover:bg-brand-950/40 dark:group-hover:text-brand-300 transition">
+                                    <i class="fa-solid fa-lock text-[10px]"></i>
+                                    <span>Terkunci</span>
+                                </span>
+                            </div>
+                        `;
+            });
+          }
+
+          html += `</div></div>`;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function handleLockedLessonClick(title) {
+        showToast(
+          `Materi "${title}" terkunci. Silakan masuk terlebih dahulu!`,
+          "info",
+        );
+        switchView("login");
+      }
+
+      function switchView(viewName) {
+        const landingView = document.getElementById("view-landing");
+        const loginView = document.getElementById("view-login");
+        const dashboardView = document.getElementById("view-dashboard");
+        const adminView = document.getElementById("view-admin");
+
+        landingView.classList.add("hidden");
+        loginView.classList.add("hidden");
+        dashboardView.classList.add("hidden");
+        adminView.classList.add("hidden");
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        if (viewName === "landing") {
+          landingView.classList.remove("hidden");
+        } else if (viewName === "login") {
+          loginView.classList.remove("hidden");
+        } else if (viewName === "admin") {
+          const session = JSON.parse(
+            localStorage.getItem("user_session") || "{}",
+          );
+          if (session.role !== "admin") {
+            showToast("Akses ditolak: Khusus akun administrator", "warning");
+            landingView.classList.remove("hidden");
+            return;
+          }
+          adminView.classList.remove("hidden");
+          renderAdminSelectOptions();
+          renderAdminManagementList();
+        } else if (viewName === "dashboard") {
+          const session = JSON.parse(
+            localStorage.getItem("user_session") || "null",
+          );
+          if (!session || !session.username) {
+            showToast(
+              "Silakan login untuk mengakses materi pembelajaran",
+              "info",
+            );
+            loginView.classList.remove("hidden");
+            return;
+          }
+          dashboardView.classList.remove("hidden");
+          renderSyllabus();
+          updateProgressStats();
+          autoOpenInitialLesson();
+        }
+      }
+
+      function autoOpenInitialLesson() {
+        if (
+          !activeLessonId &&
+          globalData.lessons &&
+          globalData.lessons.length > 0
+        ) {
+          selectLesson(globalData.lessons[0].id);
+        }
+      }
+
+      function setSyncStatus(isSyncing, text) {
+        const container = document.getElementById("sync-status");
+        const dot = document.getElementById("sync-dot");
+        const label = document.getElementById("sync-text");
+        if (!container || !dot || !label) return;
+
+        container.classList.remove("hidden");
+        container.classList.add("flex");
+        label.textContent = text;
+
+        if (isSyncing) {
+          dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-ping";
+        } else {
+          dot.className = "w-2 h-2 rounded-full bg-emerald-500";
+        }
+      }
+
+      function updateThemeToggleButton() {
+        const isDark = document.documentElement.classList.contains("dark");
+        const icon = document.getElementById("theme-icon");
+        if (icon) {
+          icon.className = isDark
+            ? "fa-solid fa-sun text-amber-400"
+            : "fa-solid fa-moon text-slate-600";
+        }
+      }
+
+      function toggleTheme() {
+        const html = document.documentElement;
+        const isDark = html.classList.toggle("dark");
+        localStorage.setItem("theme", isDark ? "dark" : "light");
+        updateThemeToggleButton();
+      }
+
+      let toastTimeout = null;
+      function showToast(msg, type = "info") {
+        const toast = document.getElementById("toast");
+        const icon = document.getElementById("toast-icon");
+        const label = document.getElementById("toast-msg");
+        if (!toast || !icon || !label) return;
+
+        label.textContent = msg;
+
+        if (type === "success") {
+          icon.className =
+            "fa-solid fa-circle-check text-emerald-400 text-base";
+        } else if (type === "warning") {
+          icon.className =
+            "fa-solid fa-triangle-exclamation text-amber-400 text-base";
+        } else {
+          icon.className = "fa-solid fa-circle-info text-sky-400 text-base";
+        }
+
+        toast.classList.remove("translate-x-full");
+        toast.classList.add("translate-x-0");
+
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          toast.classList.remove("translate-x-0");
+          toast.classList.add("translate-x-full");
+        }, 3200);
+      }
+
+      function checkSessionState() {
+        const session = JSON.parse(
+          localStorage.getItem("user_session") || "null",
+        );
+        const authContainer = document.getElementById("auth-nav-container");
+        if (!authContainer) return;
+
+        if (session && session.username) {
+          const isAdmin = session.role === "admin";
+          authContainer.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <div class="hidden sm:flex flex-col text-right">
+                            <span class="text-xs font-bold text-slate-800 dark:text-slate-100">${escapeHtml(session.username)}</span>
+                            <span class="text-[10px] ${isAdmin ? "text-amber-600 dark:text-amber-400 font-semibold" : "text-slate-400"} uppercase tracking-wider">${isAdmin ? "Administrator" : "Peserta"}</span>
+                        </div>
+                        <button onclick="switchView('dashboard')" class="px-2.5 py-1.5 rounded-xl bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 text-xs font-semibold flex items-center space-x-1.5 transition" title="Ke Ruang Belajar">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span class="hidden md:inline">Ruang Belajar</span>
+                        </button>
+                        ${
+                          isAdmin
+                            ? `
+                            <button onclick="switchView('admin')" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 hover:bg-amber-100 text-xs font-semibold flex items-center space-x-1.5 transition" title="Panel Admin">
+                                <i class="fa-solid fa-gauge-high"></i>
+                                <span class="hidden md:inline">Panel Admin</span>
+                            </button>
+                        `
+                            : ""
+                        }
+                        <button onclick="handleLogout()" class="p-2 sm:px-2.5 sm:py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-xs font-semibold flex items-center space-x-1.5 transition" title="Keluar Akun">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                            <span class="hidden sm:inline">Keluar</span>
+                        </button>
+                    </div>
+                `;
+        } else {
+          authContainer.innerHTML = `
+                    <button onclick="switchView('login')" class="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold transition flex items-center space-x-1.5 shadow-sm">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                        <span>Masuk Kelas</span>
+                    </button>
+                `;
+        }
+      }
+
+      async function handleLoginSubmit(e) {
+        e.preventDefault();
+        const u = document.getElementById("login-username").value.trim();
+        const p = document.getElementById("login-password").value.trim();
+        const btn = document.getElementById("btn-login-submit");
+
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i><span>Memeriksa...</span>`;
+
+        const res = await apiCall("login", { username: u, password: p });
+        btn.disabled = false;
+        btn.innerHTML = `<span>Masuk Sekarang</span><i class="fa-solid fa-arrow-right text-xs"></i>`;
+
+        if (res.status === "success") {
+          localStorage.setItem("user_session", JSON.stringify(res.data));
+          showToast("Selamat datang, " + res.data.username + "!", "success");
+          checkSessionState();
+          switchView("dashboard");
+        } else {
+          showToast(res.message || "Login gagal", "warning");
+        }
+      }
+
+      function quickFillLogin(u, p) {
+        document.getElementById("login-username").value = u;
+        document.getElementById("login-password").value = p;
+      }
+
+      function handleLogout() {
+        localStorage.removeItem("user_session");
+        showToast("Anda telah keluar akun", "info");
+        checkSessionState();
+        switchView("landing");
+      }
+
+      function handleSearchSyllabus(e) {
+        searchQuery = e.target.value.toLowerCase();
+        renderSyllabus();
+      }
+
+      function renderSyllabus() {
+        const container = document.getElementById("sidebar-syllabus");
+        const adminContainer = document.getElementById(
+          "admin-action-btn-container",
+        );
+        const session = JSON.parse(
+          localStorage.getItem("user_session") || "{}",
+        );
+
+        if (session.role === "admin") {
+          adminContainer.innerHTML = `
+                    <button onclick="switchView('admin')" class="px-2 py-1 bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 rounded-lg text-xs font-bold hover:bg-brand-100 transition flex items-center space-x-1" title="Kelola Modul">
+                        <i class="fa-solid fa-plus text-[10px]"></i>
+                        <span>Kelola</span>
+                    </button>
+                `;
+        } else {
+          adminContainer.innerHTML = "";
+        }
+
+        if (!globalData.modules || globalData.modules.length === 0) {
+          container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Belum ada kurikulum tersedia.</div>`;
+          return;
+        }
+
+        let html = "";
+        globalData.modules.forEach((mod) => {
+          let lessonsInMod = (globalData.lessons || []).filter(
+            (l) => l.module_id === mod.id,
+          );
+
+          if (searchQuery) {
+            lessonsInMod = lessonsInMod.filter(
+              (l) =>
+                l.judul_sub.toLowerCase().includes(searchQuery) ||
+                mod.kategori.toLowerCase().includes(searchQuery) ||
+                mod.judul_materi.toLowerCase().includes(searchQuery),
+            );
+            if (
+              lessonsInMod.length === 0 &&
+              !mod.kategori.toLowerCase().includes(searchQuery)
+            ) {
+              return;
+            }
+          }
+
+          html += `
+                    <div class="p-3.5">
+                        <div class="font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-0.5">
+                            ${mod.kategori}
+                        </div>
+                        <p class="text-xs font-bold text-slate-800 dark:text-slate-200 mb-2">${mod.judul_materi}</p>
+                        <div class="space-y-1 pl-2 border-l-2 border-slate-200 dark:border-slate-700">
+                `;
+
+          if (lessonsInMod.length === 0) {
+            html += `<p class="text-[11px] text-slate-400 italic py-1">Belum ada sub-materi.</p>`;
+          } else {
+            lessonsInMod.forEach((les) => {
+              const isActive = activeLessonId === les.id;
+              const isCompleted = completedLessons.includes(les.id);
+
+              let itemClass = isActive
+                ? "bg-brand-50 dark:bg-brand-900/40 text-brand-600 dark:text-brand-300 font-semibold shadow-sm"
+                : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50";
+
+              let badge = isCompleted
+                ? `<span class="shrink-0 text-emerald-500 font-bold ml-2 text-xs flex items-center"><i class="fa-solid fa-circle-check mr-1"></i>Selesai</span>`
+                : `<span class="shrink-0 text-slate-300 dark:text-slate-600 ml-2 text-xs"><i class="fa-regular fa-circle"></i></span>`;
+
+              html += `
+                            <button onclick="selectLesson('${les.id}')" class="w-full text-left px-3 py-2 rounded-xl text-xs transition flex items-center justify-between group ${itemClass}">
+                                <span class="truncate flex items-center">
+                                    <i class="fa-regular fa-file-lines mr-2 text-[11px] ${isActive ? "text-brand-600" : "text-slate-400"}"></i>
+                                    <span class="truncate">${les.judul_sub}</span>
+                                </span>
+                                ${badge}
+                            </button>
+                        `;
+            });
+          }
+
+          html += `</div></div>`;
+        });
+
+        container.innerHTML =
+          html ||
+          `<div class="p-6 text-center text-xs text-slate-400">Tidak ada materi yang cocok dengan pencarian.</div>`;
+      }
+
+      function selectLesson(id) {
+        activeLessonId = id;
+
+        // Auto-tandai selesai jika belum ada di list selesai (fitur auto hijau saat klik)
+        if (!completedLessons.includes(id)) {
+          completedLessons.push(id);
+          localStorage.setItem(
+            "completed_lessons",
+            JSON.stringify(completedLessons),
+          );
+        }
+
+        renderSyllabus();
+        updateProgressStats();
+
+        const lesson = (globalData.lessons || []).find((l) => l.id === id);
+        const viewContainer = document.getElementById("lesson-content-view");
+
+        if (!lesson) return;
+
+        let videoHtml = "";
+        if (lesson.video_url && lesson.video_url.trim() !== "") {
+          const embedUrl = formatYouTubeEmbedUrl(lesson.video_url);
+          if (embedUrl) {
+            videoHtml = `
+                        <div class="my-6 aspect-video rounded-2xl overflow-hidden bg-slate-900 shadow-lg border border-slate-200 dark:border-slate-700">
+                            <iframe src="${embedUrl}" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    `;
+          }
+        }
+
+        const session = JSON.parse(
+          localStorage.getItem("user_session") || "{}",
+        );
+        let adminToolbarHtml = "";
+        if (session.role === "admin") {
+          adminToolbarHtml = `
+                    <div class="mb-4 p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 flex items-center justify-between flex-wrap gap-2">
+                        <span class="text-xs font-semibold text-amber-800 dark:text-amber-300 flex items-center">
+                            <i class="fa-solid fa-shield-halved mr-1.5"></i>Otoritas Admin
+                        </span>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openEditLessonModal('${lesson.id}')" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-700 hover:bg-amber-100 dark:hover:bg-amber-900/50 transition flex items-center space-x-1">
+                                <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                                <span>Edit Materi</span>
+                            </button>
+                            <button onclick="promptDelete('lesson', '${lesson.id}', '${escapeHtml(lesson.judul_sub)}')" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-600 hover:bg-rose-700 text-white transition flex items-center space-x-1">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                                <span>Hapus</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+        }
+
+        const isCompleted = completedLessons.includes(id);
+        const btnClass = isCompleted
+          ? "px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition flex items-center space-x-2 shadow-sm"
+          : "px-4 py-2.5 bg-slate-100 hover:bg-emerald-50 dark:bg-slate-700 dark:hover:bg-emerald-950/40 text-slate-700 dark:text-slate-200 hover:text-emerald-600 font-semibold rounded-xl text-xs transition flex items-center space-x-2";
+
+        const btnIcon = isCompleted
+          ? "fa-solid fa-circle-check"
+          : "fa-regular fa-circle-check";
+        const btnText = isCompleted
+          ? "Sudah Selesai (Klik Batal)"
+          : "Tandai Selesai";
+
+        viewContainer.innerHTML = `
+                <div class="space-y-6">
+                    ${adminToolbarHtml}
+
+                    <div class="border-b border-slate-200 dark:border-slate-700 pb-5">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">Kurikulum Bootcamp</span>
+                            <span class="text-[11px] text-slate-400"><i class="fa-regular fa-calendar mr-1"></i>${new Date(lesson.created_at).toLocaleDateString("id-ID")}</span>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 dark:text-slate-100 tracking-tight">${lesson.judul_sub}</h1>
+                    </div>
+
+                    ${videoHtml}
+
+                    <div class="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed space-y-4">
+                        ${lesson.konten_html}
+                    </div>
+
+                    <div class="pt-8 border-t border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+                        <button onclick="toggleCompleteLesson('${lesson.id}')" class="${btnClass}">
+                            <i class="${btnIcon} text-sm"></i>
+                            <span>${btnText}</span>
+                        </button>
+                        
+                        <div class="flex items-center space-x-2">
+                            <button onclick="navigateLesson(-1)" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 transition flex items-center space-x-1.5">
+                                <i class="fa-solid fa-arrow-left text-[10px]"></i>
+                                <span>Sebelumnya</span>
+                            </button>
+                            <button onclick="navigateLesson(1)" class="px-3 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 transition flex items-center space-x-1.5">
+                                <span>Selanjutnya</span>
+                                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+      }
+
+      function toggleCompleteLesson(id) {
+        const index = completedLessons.indexOf(id);
+        if (index > -1) {
+          completedLessons.splice(index, 1);
+          showToast("Status materi diubah menjadi Belum Selesai", "info");
+        } else {
+          completedLessons.push(id);
+          showToast("Materi ditandai Selesai!", "success");
+        }
+        localStorage.setItem(
+          "completed_lessons",
+          JSON.stringify(completedLessons),
+        );
+        selectLesson(id);
+      }
+
+      async function copyCodeSnippet(btnElement) {
+        const box = btnElement.closest(".code-snippet-box");
+        if (!box) return;
+
+        const codeElement = box.querySelector(".code-snippet-body code");
+        if (!codeElement) return;
+
+        const textToCopy = codeElement.innerText;
+
+        try {
+          // Clipboard copy safe method
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(textToCopy);
+          } else {
+            const temp = document.createElement("textarea");
+            temp.value = textToCopy;
+            document.body.appendChild(temp);
+            temp.select();
+            document.execCommand("copy");
+            document.body.removeChild(temp);
+          }
+
+          const originalContent = btnElement.innerHTML;
+          btnElement.innerHTML = `<i class="fa-solid fa-check text-emerald-400"></i><span class="text-emerald-400 font-medium">Tersalin!</span>`;
+          btnElement.classList.add("bg-slate-800");
+
+          setTimeout(() => {
+            btnElement.innerHTML = originalContent;
+            btnElement.classList.remove("bg-slate-800");
+          }, 2000);
+        } catch (err) {
+          showToast("Gagal menyalin kode!", "warning");
+        }
+      }
+
+      function formatYouTubeEmbedUrl(input) {
+        if (!input || typeof input !== "string") return "";
+        let raw = input.trim();
+        if (!raw) return "";
+
+        const iframeMatch = raw.match(/src=["']([^"']+)["']/i);
+        if (iframeMatch) {
+          raw = iframeMatch[1];
+        }
+
+        const regex =
+          /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i;
+        const match = raw.match(regex);
+
+        if (match && match[1]) {
+          return `https://www.youtube.com/embed/${match[1]}`;
+        }
+
+        if (raw.startsWith("https://www.youtube.com/embed/")) {
+          return raw;
+        }
+
+        return raw;
+      }
+
+      function handleVideoUrlInput(inputEl) {
+        const val = inputEl.value.trim();
+        const hintId =
+          inputEl.id === "admin-les-video"
+            ? "admin-video-hint"
+            : "edit-video-hint";
+        const hintEl = document.getElementById(hintId);
+
+        if (!val) {
+          if (hintEl) hintEl.classList.add("hidden");
+          return;
+        }
+
+        const converted = formatYouTubeEmbedUrl(val);
+        if (converted.startsWith("https://www.youtube.com/embed/")) {
+          inputEl.value = converted;
+          if (hintEl) {
+            hintEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500 mr-1"></i>Format embed valid: <code class="text-emerald-600 dark:text-emerald-400">${converted}</code>`;
+            hintEl.classList.remove("hidden");
+          }
+        } else if (hintEl) {
+          hintEl.innerHTML = `<i class="fa-solid fa-circle-info text-amber-500 mr-1"></i>Pastikan URL berasal dari video YouTube.`;
+          hintEl.classList.remove("hidden");
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function openSnippetModal(
+        type = "terminal",
+        targetId = "admin-les-konten",
+      ) {
+        activeSnippetTargetInput = targetId;
+        const modal = document.getElementById("modal-snippet");
+        if (!modal) return;
+        modal.classList.remove("hidden");
+        applySnippetPreset(type);
+      }
+
+      function closeSnippetModal() {
+        const modal = document.getElementById("modal-snippet");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      function applySnippetPreset(type) {
+        const btnTerm = document.getElementById("preset-btn-terminal");
+        const btnCode = document.getElementById("preset-btn-code");
+        const labelInput = document.getElementById("snippet-label");
+        const codeInput = document.getElementById("snippet-code-text");
+
+        if (type === "terminal") {
+          btnTerm.className =
+            "px-3 py-2 rounded-xl text-xs font-semibold border border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 flex items-center justify-center space-x-2";
+          btnCode.className =
+            "px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center space-x-2";
+          labelInput.value = "bash";
+          if (!codeInput.value.trim() || codeInput.value.includes("// Ketik")) {
+            codeInput.value = `composer create-project laravel/laravel "event-kampus" "10.*" --no-security-blocking\ncd event-kampus`;
+          }
+        } else {
+          btnCode.className =
+            "px-3 py-2 rounded-xl text-xs font-semibold border border-brand-500 bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300 flex items-center justify-center space-x-2";
+          btnTerm.className =
+            "px-3 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-center space-x-2";
+          labelInput.value = "routes/web.php";
+          if (!codeInput.value.trim() || codeInput.value.includes("composer")) {
+            codeInput.value = `use Illuminate\\Support\\Facades\\Route;\n\nRoute::get('/', function () {\n    return view('welcome');\n});`;
+          }
+        }
+        updateSnippetModalPreview();
+      }
+
+      function updateSnippetModalPreview() {
+        const label =
+          document.getElementById("snippet-label").value.trim() || "terminal";
+        const code = document.getElementById("snippet-code-text").value;
+        const container = document.getElementById("snippet-preview-container");
+
+        const escaped = escapeHtml(code);
+
+        container.innerHTML = `
+                <div class="code-snippet-box my-1">
+                    <div class="code-snippet-header">
+                        <div class="flex items-center space-x-3">
+                            <div class="mac-dots">
+                                <span class="mac-dot red"></span>
+                                <span class="mac-dot yellow"></span>
+                                <span class="mac-dot green"></span>
+                            </div>
+                            <span class="text-xs font-mono font-medium text-slate-400 ml-1">${escapeHtml(label)}</span>
+                        </div>
+                        <button type="button" class="text-xs text-slate-400 flex items-center space-x-1.5 px-2.5 py-1 rounded-md">
+                            <i class="fa-regular fa-copy"></i>
+                            <span>Salin</span>
+                        </button>
+                    </div>
+                    <pre class="code-snippet-body"><code>${escaped}</code></pre>
+                </div>
+            `;
+      }
+
+      function insertSnippetToTextarea() {
+        const label =
+          document.getElementById("snippet-label").value.trim() || "terminal";
+        const code = document.getElementById("snippet-code-text").value;
+        const textarea = document.getElementById(activeSnippetTargetInput);
+
+        if (!textarea) return;
+
+        const escaped = escapeHtml(code);
+        const template = `
+<div class="code-snippet-box">
+    <div class="code-snippet-header">
+        <div class="flex items-center space-x-3">
+            <div class="mac-dots">
+                <span class="mac-dot red"></span>
+                <span class="mac-dot yellow"></span>
+                <span class="mac-dot green"></span>
+            </div>
+            <span class="text-xs font-mono font-medium text-slate-400 ml-1">${escapeHtml(label)}</span>
+        </div>
+        <button onclick="copyCodeSnippet(this)" class="text-xs text-slate-400 hover:text-white flex items-center space-x-1.5 transition px-2.5 py-1 rounded-md hover:bg-slate-800">
+            <i class="fa-regular fa-copy"></i>
+            <span>Salin</span>
+        </button>
+    </div>
+    <pre class="code-snippet-body"><code>${escaped}</code></pre>
+</div>
+`;
+        textarea.value += template;
+        closeSnippetModal();
+        showToast(
+          "Blok (" + label + ") berhasil disisipkan ke editor materi!",
+          "success",
+        );
+      }
+
+      function renderAdminManagementList() {
+        const container = document.getElementById("admin-management-list");
+        if (!container) return;
+
+        if (!globalData.modules || globalData.modules.length === 0) {
+          container.innerHTML = `<div class="p-6 text-center text-xs text-slate-400">Belum ada kurikulum yang terdaftar.</div>`;
+          return;
+        }
+
+        let html = "";
+        globalData.modules.forEach((mod) => {
+          const lessons = (globalData.lessons || []).filter(
+            (l) => l.module_id === mod.id,
+          );
+
+          html += `
+                    <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/50 space-y-3">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-700 pb-2.5">
+                            <div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600 dark:text-brand-400">${mod.kategori}</span>
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100">${mod.judul_materi}</h4>
+                            </div>
+                            <div class="flex items-center space-x-2 shrink-0">
+                                <button onclick="openEditModuleModal('${mod.id}')" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 transition flex items-center space-x-1">
+                                    <i class="fa-solid fa-pen-to-square text-[10px]"></i>
+                                    <span>Edit Modul</span>
+                                </button>
+                                <button onclick="promptDelete('module', '${mod.id}', '${escapeHtml(mod.judul_materi)}')" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300 transition flex items-center space-x-1">
+                                    <i class="fa-solid fa-trash text-[10px]"></i>
+                                    <span>Hapus Modul</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 pl-2 border-l-2 border-brand-200 dark:border-brand-900/60">
+                `;
+
+          if (lessons.length === 0) {
+            html += `<p class="text-xs text-slate-400 italic py-1">Belum ada sub-materi di modul ini.</p>`;
+          } else {
+            lessons.forEach((les) => {
+              html += `
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-white dark:bg-slate-700/60 border border-slate-100 dark:border-slate-700 text-xs">
+                                <span class="font-medium text-slate-700 dark:text-slate-200 truncate pr-2">
+                                    <i class="fa-regular fa-file-code mr-1.5 text-slate-400"></i>${les.judul_sub}
+                                </span>
+                                <div class="flex items-center space-x-1.5 shrink-0">
+                                    <button onclick="openEditLessonModal('${les.id}')" class="p-1.5 text-slate-500 hover:text-amber-600 dark:hover:text-amber-400 transition" title="Edit Materi">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </button>
+                                    <button onclick="promptDelete('lesson', '${les.id}', '${escapeHtml(les.judul_sub)}')" class="p-1.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 transition" title="Hapus Materi">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+            });
+          }
+
+          html += `</div></div>`;
+        });
+
+        container.innerHTML = html;
+      }
+
+      function openEditModuleModal(id) {
+        const mod = (globalData.modules || []).find((m) => m.id === id);
+        if (!mod) return;
+
+        document.getElementById("edit-mod-id").value = mod.id;
+        document.getElementById("edit-mod-kategori").value = mod.kategori;
+        document.getElementById("edit-mod-judul").value = mod.judul_materi;
+        document.getElementById("edit-mod-desc").value = mod.deskripsi || "";
+
+        document.getElementById("modal-edit-module").classList.remove("hidden");
+      }
+
+      function closeEditModuleModal() {
+        const modal = document.getElementById("modal-edit-module");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      async function handleUpdateModuleSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById("edit-mod-id").value;
+        const kat = document.getElementById("edit-mod-kategori").value.trim();
+        const judul = document.getElementById("edit-mod-judul").value.trim();
+        const desc = document.getElementById("edit-mod-desc").value.trim();
+        const btn = document.getElementById("btn-update-mod");
+
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+
+        const res = await apiCall("update", {
+          type: "module",
+          id: id,
+          kategori: kat,
+          judul_materi: judul,
+          deskripsi: desc,
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Simpan Perubahan";
+
+        if (res.status === "success") {
+          showToast("Modul berhasil diperbarui!", "success");
+          closeEditModuleModal();
+          await loadCurriculumWithSWR();
+          renderAdminManagementList();
+        } else {
+          showToast(res.message || "Gagal memperbarui modul", "warning");
+        }
+      }
+
+      function openEditLessonModal(id) {
+        const les = (globalData.lessons || []).find((l) => l.id === id);
+        if (!les) return;
+
+        const select = document.getElementById("edit-les-modid");
+        select.innerHTML = (globalData.modules || [])
+          .map(
+            (m) => `
+                <option value="${m.id}" ${m.id === les.module_id ? "selected" : ""}>${m.kategori} - ${m.judul_materi}</option>
+            `,
+          )
+          .join("");
+
+        document.getElementById("edit-les-id").value = les.id;
+        document.getElementById("edit-les-judul").value = les.judul_sub;
+        document.getElementById("edit-les-video").value = les.video_url || "";
+        document.getElementById("edit-les-konten").value = les.konten_html;
+
+        document.getElementById("modal-edit-lesson").classList.remove("hidden");
+      }
+
+      function closeEditLessonModal() {
+        const modal = document.getElementById("modal-edit-lesson");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      async function handleUpdateLessonSubmit(e) {
+        e.preventDefault();
+        const id = document.getElementById("edit-les-id").value;
+        const modId = document.getElementById("edit-les-modid").value;
+        const judul = document.getElementById("edit-les-judul").value.trim();
+        const video = document.getElementById("edit-les-video").value.trim();
+        const konten = document.getElementById("edit-les-konten").value;
+        const btn = document.getElementById("btn-update-les");
+
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+
+        const res = await apiCall("update", {
+          type: "lesson",
+          id: id,
+          module_id: modId,
+          judul_sub: judul,
+          video_url: video,
+          konten_html: konten,
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Simpan Perubahan";
+
+        if (res.status === "success") {
+          showToast("Sub-materi berhasil diperbarui!", "success");
+          closeEditLessonModal();
+          await loadCurriculumWithSWR();
+          renderAdminManagementList();
+          if (activeLessonId === id) {
+            selectLesson(id);
+          }
+        } else {
+          showToast(res.message || "Gagal memperbarui materi", "warning");
+        }
+      }
+
+      async function handleAddModule(e) {
+        e.preventDefault();
+        const kat = document.getElementById("admin-mod-kategori").value.trim();
+        const judul = document.getElementById("admin-mod-judul").value.trim();
+        const desc = document.getElementById("admin-mod-desc").value.trim();
+        const btn = document.getElementById("btn-save-mod");
+
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+
+        const res = await apiCall("create", {
+          type: "module",
+          kategori: kat,
+          judul_materi: judul,
+          deskripsi: desc,
+          urutan: String((globalData.modules || []).length + 1),
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Simpan Modul";
+
+        if (res.status === "success") {
+          showToast("Modul baru berhasil ditambahkan!", "success");
+          document.getElementById("admin-mod-kategori").value = "";
+          document.getElementById("admin-mod-judul").value = "";
+          document.getElementById("admin-mod-desc").value = "";
+          await loadCurriculumWithSWR();
+          renderAdminSelectOptions();
+          renderAdminManagementList();
+        } else {
+          showToast(res.message || "Gagal menambahkan modul", "warning");
+        }
+      }
+
+      async function handleAddLesson(e) {
+        e.preventDefault();
+        const modId = document.getElementById("admin-les-modid").value;
+        const judul = document.getElementById("admin-les-judul").value.trim();
+        const video = document.getElementById("admin-les-video").value.trim();
+        const konten = document.getElementById("admin-les-konten").value;
+        const btn = document.getElementById("btn-save-les");
+
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+
+        const res = await apiCall("create", {
+          type: "lesson",
+          module_id: modId,
+          judul_sub: judul,
+          video_url: video,
+          konten_html: konten,
+          urutan: String(
+            (globalData.lessons || []).filter((l) => l.module_id === modId)
+              .length + 1,
+          ),
+        });
+
+        btn.disabled = false;
+        btn.textContent = "Simpan Sub-Materi";
+
+        if (res.status === "success") {
+          showToast("Sub-materi baru berhasil ditambahkan!", "success");
+          document.getElementById("admin-les-judul").value = "";
+          document.getElementById("admin-les-video").value = "";
+          document.getElementById("admin-les-konten").value = "";
+          const hint = document.getElementById("admin-video-hint");
+          if (hint) hint.classList.add("hidden");
+          await loadCurriculumWithSWR();
+          renderAdminManagementList();
+        } else {
+          showToast(res.message || "Gagal menambahkan materi", "warning");
+        }
+      }
+
+      function renderAdminSelectOptions() {
+        const select = document.getElementById("admin-les-modid");
+        if (!select) return;
+
+        if (!globalData.modules || globalData.modules.length === 0) {
+          select.innerHTML =
+            '<option value="">-- Buat Modul Terlebih Dahulu --</option>';
+          return;
+        }
+
+        select.innerHTML = globalData.modules
+          .map(
+            (m) => `
+                <option value="${m.id}">${escapeHtml(m.kategori)} - ${escapeHtml(m.judul_materi)}</option>
+            `,
+          )
+          .join("");
+      }
+
+      function promptDelete(type, id, title = "") {
+        pendingDeleteTarget = { type, id };
+        const modal = document.getElementById("modal-confirm-delete");
+        const desc = document.getElementById("delete-confirm-text");
+        if (desc) {
+          desc.textContent = `Apakah Anda yakin ingin menghapus ${type === "module" ? "modul dan seluruh sub-materi di dalamnya" : "sub-materi"} "${title || id}"? Tindakan ini tidak dapat dibatalkan.`;
+        }
+        if (modal) modal.classList.remove("hidden");
+      }
+
+      function closeDeleteConfirmModal() {
+        pendingDeleteTarget = null;
+        const modal = document.getElementById("modal-confirm-delete");
+        if (modal) modal.classList.add("hidden");
+      }
+
+      async function executePendingDelete() {
+        if (!pendingDeleteTarget) return;
+
+        const { type, id } = pendingDeleteTarget;
+        const btn = document.getElementById("btn-confirm-delete-action");
+        if (btn) {
+          btn.disabled = true;
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i> Menghapus...`;
+        }
+
+        const res = await apiCall("delete", { type, id });
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-trash-can text-xs"></i><span>Ya, Hapus Sekarang</span>`;
+        }
+
+        closeDeleteConfirmModal();
+
+        if (res.status === "success") {
+          showToast(res.message || "Data berhasil dihapus!", "success");
+          if (type === "lesson" && activeLessonId === id) {
+            activeLessonId = null;
+            const container = document.getElementById("lesson-content-view");
+            if (container) {
+              container.innerHTML = `
+                            <div class="text-center py-20 space-y-4">
+                                <div class="w-20 h-20 bg-slate-100 dark:bg-slate-700 text-slate-400 rounded-3xl flex items-center justify-center mx-auto text-3xl">
+                                    <i class="fa-solid fa-book-open"></i>
+                                </div>
+                                <h3 class="text-lg font-bold">Materi Telah Dihapus</h3>
+                                <p class="text-xs text-slate-400">Silakan pilih materi lain dari daftar isi di samping.</p>
+                            </div>
+                        `;
+            }
+          }
+          await loadCurriculumWithSWR();
+          renderAdminSelectOptions();
+          renderAdminManagementList();
+        } else {
+          showToast(res.message || "Gagal menghapus data", "warning");
+        }
+      }
+
+      function updateProgressStats() {
+        const allLessons = globalData.lessons || [];
+        const total = allLessons.length;
+        const completedCount = allLessons.filter((l) =>
+          completedLessons.includes(l.id),
+        ).length;
+        const percent =
+          total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+        const textEl = document.getElementById("progress-summary-text");
+        const barEl = document.getElementById("progress-bar-fill");
+
+        if (textEl) {
+          textEl.textContent = `${completedCount} dari ${total} materi terselesaikan (${percent}%)`;
+        }
+        if (barEl) {
+          barEl.style.width = `${percent}%`;
+        }
+      }
+
+      function navigateLesson(direction) {
+        const allLessons = globalData.lessons || [];
+        if (allLessons.length === 0) return;
+
+        const currentIndex = allLessons.findIndex(
+          (l) => l.id === activeLessonId,
+        );
+        let nextIndex = currentIndex + direction;
+
+        if (nextIndex < 0) {
+          showToast("Anda berada di materi pertama", "info");
+          return;
+        }
+        if (nextIndex >= allLessons.length) {
+          showToast("Selamat! Anda telah mencapai materi terakhir", "info");
+          return;
+        }
+
+        selectLesson(allLessons[nextIndex].id);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    </script>
+  </body>
+</html>
